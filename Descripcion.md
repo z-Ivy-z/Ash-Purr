@@ -43,6 +43,8 @@ Antes de cada enfrentamiento podrás equipar un único amuleto para adaptar tu e
 
 ##### **Sistema de Amuletos**
 
+**A lo largo del juego aparecen diferentes amuletos que no son del almohadita de tu tiempo ni ubicación como si tu almohadita de los enviara para ayudarte a rescatarlo, tu sabe4s que no son de tu gato pero hay algo que que resulta familiar su calidez**
+
 
 
 Objetos personales del caballero que pertenecieron a Almohadita. Antes de cada combate, el jugador puede elegir un único amuleto para equipar. Cada uno otorga una ventaja, pero también una desventaja, obligando a adaptar la estrategia para cada jefe.
@@ -131,7 +133,7 @@ Efecto:
 
 Mayor efectividad contra:
 
-Jefe final
+The Uknow One
 
 
 
@@ -149,13 +151,13 @@ Efecto:
 
 ⚔️ Ataque cuerpo a cuerpo rápido.
 
-⚡ Se activa casi al instante.+
+⚡ Se activa casi al instante.
 
 
 
 Mayor efectividad contra:
 
-Mago
+The Lost Spirit
 
 
 
@@ -179,9 +181,9 @@ Efecto:
 
 Mayor efectividad contra:
 
-Leon
+The White Lion
 
-Asesina
+Lady Death
 
 
 

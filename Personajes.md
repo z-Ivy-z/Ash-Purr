@@ -1,4 +1,4 @@
-# PERSONAJES
+# TARJETA DE PERSONAJES
 
 #### Arena
 
@@ -28,9 +28,17 @@ Mucho antes del nacimiento del reino, una antigua deidad selló una inmensa fuen
 
 
 
-##### **\[USER]**
+Poder:
 
-Un pequeño caballero con una armadura de estilo medieval que nunca se quita el casco. Nadie conoce su verdadera apariencia; donde deberían verse sus ojos solo se aprecia una profunda sombra oscura. Ágil y decidido, combate utilizando un mayal como su arma principal. Entre sus pocas pertenencias más preciadas lleva una fotografía de Almohadita junto con algunos objetos que pertenecieron al gato, recuerdos que le dan la fuerza para seguir luchando y recuperarlo.
+Tiene la haabilidad de poder viajar atravez del tiempo y el espacio en diferentes dimensiones y realidades, el poder se encuentra oculto dentro de almohadita al tratar de liberaro incorrectamente es lo que provoca la distrorsion y colision de realidades, el puede utilizaelo para enviarte amuletos que le han pertenecido a distintos allmoaditas a lo largo el tiempo para ayudarte a llegar a el
+
+
+
+##### **\[USER] Bob**
+
+Un pequeño caballero con una armadura de estilo medieval que nunca se quita el yelmo es pequeño. Nadie conoce su verdadera apariencia; donde deberían verse sus ojos solo se aprecia una profunda sombra oscura. Ágil y decidido, combate utilizando una ramita de árbol con una hojita como su arma principal. Entre sus pocas pertenencias más preciadas lleva una fotografía de Almohadita junto con algunos objetos que pertenecieron al gato, recuerdos que le dan la fuerza para seguir luchando y recuperarlo.
+
+&#x20;
 
 
 
@@ -52,11 +60,31 @@ Un antiguo mago que tras su muerte, su espíritu jamás encontró descanso y fue
 
 
 
-###### Dificultad: ★★★☆☆
+###### Apariencia:
+
+
+
+
+
+###### Dificultad: ★☆☆☆☆
+
+
+
+###### Estilo de Pelea:
 
 
 
 ###### Ataques
+
+
+
+**Basicos:**
+
+
+
+
+
+**Especiales:**
 
 🔹 Lightning Spear
 
@@ -86,6 +114,8 @@ Los proyectiles son ligeramente más rápidos.
 
 
 
+###### Propósito:
+
 Este diseño mantiene el combate simple, dinámico y enfocado en esquivar, encontrar una ventana para atacar y repetir, muy en la línea de un boss arcade con inspiración souls-like.
 
 
@@ -98,7 +128,7 @@ Una asesina de élite contratada por el rey para eliminar a cualquiera que inten
 
 
 
-###### Dificultad: ★★★★☆
+###### Dificultad: ★★★☆☆
 
 
 
@@ -146,7 +176,7 @@ Una enorme bestia felina que se encariñó con el pequeño gato y llegó a consi
 
 
 
-###### Dificultad: ★★★★☆
+###### Dificultad: ★★★☆☆
 
 
 
@@ -188,41 +218,100 @@ Este combate se centra en esquivar ataques rápidos y aprovechar los breves mome
 
 ##### **The Cat Keeper (Penultimate Boss)**
 
+Estilo:
 
-
-###### Descripción:
-
-Un gran caballero encapuchado, reconocido como el mejor guerrero del reino y el más leal servidor del rey. Durante todo el juego ha protegido al gato, convencido de que liberarlo traerá de vuelta un antiguo mal. Sin embargo, desconoce que el verdadero rey fue suplantado por The Unknown One, quien manipuló sus órdenes para convertirlo en el último guardián antes de llegar al responsable del secuestro. Armado con una espada colosal y una disciplina impecable, luchará hasta el final para cumplir lo que cree que es la voluntad de su rey.
+2D simple con colores solidos, las sombras deben ser colores solidos también, que sea un estilo lindo y agradable, con formas bien definidas
 
 
 
-###### Dificultad: ★★★★☆
+###### Historia:
+
+Un gran caballero, reconocido como el mejor guerrero del reino y el más leal servidor del rey. Durante todo el juego ha protegido al gato, convencido de que liberarlo traerá de vuelta un antiguo mal. Sin embargo, desconoce que el verdadero rey fue suplantado por The Unknown One, quien manipuló sus órdenes para convertirlo en el último guardián antes de llegar al responsable del secuestro. Armado con una espada colosal y una disciplina impecable, luchará hasta el final para cumplir lo que cree que es la voluntad de su rey.
+
+
+
+###### Personalidad:
+
+Hombre grande y orgulloso, de una voluntad y fe inquebrantable hacia su rey, con aires de grandeza, reconoce el esfuerzo y la enorme fuerza de voluntad que el pequeño caballero a demostrado para llegar hasta este punto.
+
+
+
+###### Apariencia:
+
+Hombre fuerte y vigoroso, cubierto por una gran armadura brillante y plateada y una capa pesada de color negro, con un rostro ligeramente deformado producto de las innumerables batallas que ha librado, caucásico de ojos y cabello negro
+
+&#x20;
+
+###### Dificultad: ★★★★★
+
+
+
+###### Estilo de pelea
+
+Pelea de forma lenta pero poderosa ejecutando combos simples pero devastadores acompañado de sus ataques especiales, dejando claras pero momentáneas ventanas de oportunidad parta poder contratacar sus ataques. contando con dos combos de ataque:
+
+1. COMBO BASICO: Conta de tres golpes, ventana de oportunidad corta, posteriormente ejecutando un ataque especial
+2. COMBO AVANMZADO: Consta de 5 golpes, ventana de mayor tiempo con respecto al primero combo rara vez ejecutando un ataque especial después de ejecutar el combo
 
 
 
 ###### Ataques
 
+**Básicos:**
 
+
+
+**Especiales:**
 
 🔹 Swift Slash
 
-Realiza un rápido combo de tres ataques con su espada que lo dejan exhausto.
+Realiza un tajo ascendente que lo eleva en el aire para después caer con un poderoso golpe al suelo
+
+Frecuencia:
+
+Probabilidad del 40% de utilizar al terminar con un combo básico.
+
+Probabilidad del 30% de utilizar al terminar un combo avanzado.
+
+Probabilidad del 15% de utilizarse en cualquier momento del combate
 
 🔹 Assult
 
 Se desplaza hacia el jugador y lo embiste usando su cuerpo.
 
+Frecuencia:
+
+Probabilidad del 60% de utilizar al terminar un combo básico
+
+Probabilidad del 65% de utilizar al terminar un combo avanzado:
+
+
+
 🔹 Sismic Strike
 
 Lanza una onda de choque que atraviesa gran parte de la arena.
 
+Frecuencia:
+
+Puede utilizarse en cualquier momento siempre y cuando no se encadene consigo mismo mas de dos veces seguidas dejando una ventana de oportunidad de contraatacar corta
 
 
-###### Segunda fase (40% de vida)
+
+###### ***Segunda fase (40% de vida)***
+
+***La fractura temporal provoca que la mente del campeón colisione con múltiples versiones de si mismo de un lugar y época muy diferentes al suyo, generando un estado de locura producto de la fusión mental que las anomalías espacio-tiempo comenzaron a crear en su mente.***
 
 
 
-El Guardián deja caer parte de su capa y pelea con mayor velocidad.
+***\[La arena obtiene fisuras agresivas y repentinas permitiendo que las realidades colisionen]***
+
+
+
+***Personalidad: El caballero comienza a producir desgarradores gritos de dolor mientras expresa confusión por lo que sucede en su mente a tal punto que comienza a perder la capacidad de hablar y solo puede generar lo que parecieran ser sonidos bestiales de forma agónica***
+
+
+
+El Guardián se deshace de su armadura de manera violenta y pelea de una manera mas frenética y descontrolada, casi bestial.
 
 
 
@@ -248,7 +337,7 @@ La entidad responsable del secuestro y la verdadera fuente de la corrupción que
 
 
 
-###### Dificultad: ★★★★★
+###### Dificultad: ★★★★☆
 
 
 
