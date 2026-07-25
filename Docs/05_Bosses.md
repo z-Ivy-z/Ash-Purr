@@ -1,4 +1,4 @@
-# 05_Bosses.md
+# 05 Bosses
 
 # Boss Design Document
 

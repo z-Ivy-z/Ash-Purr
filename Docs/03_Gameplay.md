@@ -1,4 +1,4 @@
-# 03_Gameplay.md
+# 03 Gameplay
 
 # Gameplay Design Document
 
