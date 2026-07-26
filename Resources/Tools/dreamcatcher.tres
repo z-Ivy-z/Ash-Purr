@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ToolResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Save/tool_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+tool_name = &"dreamcatcher"
+display_name = "Dreamcatcher"
+description = "A mystical healing charm. Restores 10% of maximum health on use."
+icon = null
+damage_multiplier = 0.0
+cooldown_seconds = 12.0
+startup_frames = 8
+tool_type = 2
+projectile_scene = null

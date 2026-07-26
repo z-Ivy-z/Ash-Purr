@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ToolResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Save/tool_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+tool_name = &"throwing_knife"
+display_name = "Throwing Knife"
+description = "A swift ranged projectile. Deals moderate damage from a safe distance."
+icon = null
+damage_multiplier = 1.5
+cooldown_seconds = 4.0
+startup_frames = 6
+tool_type = 1
+projectile_scene = null

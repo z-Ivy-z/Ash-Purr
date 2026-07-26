@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="AttackResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Save/attack_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+attack_name = &"boss_seismic_strike"
+damage = 45
+hitbox_start_frame = 12
+hitbox_end_frame = 20
+combo_window_start_frame = 0
+combo_window_end_frame = 0
+hit_stop_frames = 8
+screen_shake_pixels = 10.0
+knockback_pixels = 150.0
+knockback_direction = Vector2(1, 0)
+animation_name = &"seismic_strike"
+total_frames = 40
+recovery_frames = 24

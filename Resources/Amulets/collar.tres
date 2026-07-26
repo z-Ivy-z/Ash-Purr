@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AmuletResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Save/amulet_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+amulet_name = &"collar"
+display_name = "Almohadita's Collar"
+description = "A worn collar that still carries warmth. Reduces damage taken but increases tool cooldowns."
+icon = null
+damage_modifier = 1.0
+defense_modifier = 0.8
+health_modifier = 1.0
+cooldown_modifier = 1.3

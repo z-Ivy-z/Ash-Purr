@@ -1,0 +1,99 @@
+[gd_scene load_steps=18 format=3 uid="uid://c5player_scene01"]
+
+[ext_resource type="Script" path="res://Scripts/Player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://Scripts/Player/player_state_machine.gd" id="2_psm"]
+[ext_resource type="Script" path="res://Scripts/Player/States/idle_state.gd" id="3_idle"]
+[ext_resource type="Script" path="res://Scripts/Player/States/run_state.gd" id="4_run"]
+[ext_resource type="Script" path="res://Scripts/Player/States/attack_state.gd" id="5_attack"]
+[ext_resource type="Script" path="res://Scripts/Player/States/recovery_state.gd" id="6_recovery"]
+[ext_resource type="Script" path="res://Scripts/Player/States/dodge_state.gd" id="7_dodge"]
+[ext_resource type="Script" path="res://Scripts/Player/States/hit_state.gd" id="8_hit"]
+[ext_resource type="Script" path="res://Scripts/Player/States/death_state.gd" id="9_death"]
+[ext_resource type="Script" path="res://Scripts/Components/health_component.gd" id="10_health"]
+[ext_resource type="Script" path="res://Scripts/Components/hitbox_component.gd" id="11_hitbox"]
+[ext_resource type="Script" path="res://Scripts/Components/hurtbox_component.gd" id="12_hurtbox"]
+[ext_resource type="Script" path="res://Scripts/Components/combo_controller.gd" id="13_combo"]
+[ext_resource type="Script" path="res://Scripts/Components/tool_controller.gd" id="14_tool"]
+[ext_resource type="Script" path="res://Scripts/Components/amulet_controller.gd" id="15_amulet"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(32, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
+size = Vector2(48, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
+size = Vector2(28, 56)
+
+[node name="Player" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("1_player")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_body")
+
+[node name="PlayerStateMachine" type="Node" parent="."]
+script = ExtResource("2_psm")
+player = NodePath("..")
+initial_state = &"idle"
+
+[node name="Idle" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("3_idle")
+
+[node name="Run" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("4_run")
+
+[node name="Attack" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("5_attack")
+
+[node name="Recovery" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("6_recovery")
+
+[node name="Dodge" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("7_dodge")
+
+[node name="Hit" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("8_hit")
+
+[node name="Death" type="Node" parent="PlayerStateMachine"]
+script = ExtResource("9_death")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("10_health")
+max_health = 100
+
+[node name="HitboxComponent" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 64
+monitoring = false
+script = ExtResource("11_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
+position = Vector2(24, 0)
+disabled = true
+shape = SubResource("RectangleShape2D_hitbox")
+
+[node name="HurtboxComponent" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 288
+script = ExtResource("12_hurtbox")
+health_component = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent"]
+shape = SubResource("RectangleShape2D_hurtbox")
+
+[node name="ComboController" type="Node" parent="."]
+script = ExtResource("13_combo")
+
+[node name="ToolController" type="Node" parent="."]
+script = ExtResource("14_tool")
+amulet_controller = NodePath("../AmuletController")
+health_component = NodePath("../HealthComponent")
+
+[node name="AmuletController" type="Node" parent="."]
+script = ExtResource("15_amulet")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]

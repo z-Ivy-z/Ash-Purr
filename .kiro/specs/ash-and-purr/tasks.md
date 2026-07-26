@@ -6,36 +6,36 @@ This plan implements a 2D arcade action game with soulslike combat in Godot Engi
 
 ## Tasks
 
-- [ ] 1. Project structure, autoload singletons, and data resources
-  - [ ] 1.1 Create folder structure and register autoload singletons
+- [x] 1. Project structure, autoload singletons, and data resources
+  - [x] 1.1 Create folder structure and register autoload singletons
     - Create the full `res://` directory structure as defined in the design (Scenes/, Scripts/, Resources/, Audio/, etc.)
     - Create placeholder autoload scene files (game_manager.tscn, audio_manager.tscn, save_manager.tscn, scene_manager.tscn, settings_manager.tscn, input_manager.tscn) under Autoload/
     - Implement Scripts/Managers/game_manager.gd with state properties (current_scene_id, current_boss_phase, is_player_alive, is_paused) and signals
     - Register all 6 autoloads in project.godot
     - _Requirements: 23.3, 23.5_
 
-  - [ ] 1.2 Create data resource scripts (AttackResource, AmuletResource, ToolResource, BossPhaseConfig)
+  - [x] 1.2 Create data resource scripts (AttackResource, AmuletResource, ToolResource, BossPhaseConfig)
     - Implement Scripts/Save/attack_resource.gd with all exported fields (damage, hitbox frames, hit stop, screen shake, knockback, animation name, recovery frames)
     - Implement Scripts/Save/amulet_resource.gd with modifier fields (damage_modifier, defense_modifier, health_modifier, cooldown_modifier)
     - Implement Scripts/Save/tool_resource.gd with fields (damage_multiplier, cooldown_seconds, startup_frames, tool_type enum, projectile_scene)
     - Implement Scripts/Save/boss_phase_config.gd with phase multiplier fields
     - _Requirements: 3.5, 3.6, 8.3, 8.4, 8.7, 8.8, 10.2, 10.3, 10.4, 11.2, 11.3, 11.4, 11.5_
 
-  - [ ] 1.3 Create .tres resource instances for attacks, amulets, tools, and boss phase configs
+  - [x] 1.3 Create .tres resource instances for attacks, amulets, tools, and boss phase configs
     - Create Resources/Attacks/ with player_attack_1.tres, player_attack_2.tres, player_attack_3.tres, boss_basic_combo.tres, boss_advanced_combo.tres, boss_swift_slash.tres, boss_assault.tres, boss_seismic_strike.tres
     - Create Resources/Amulets/ with photograph.tres (1.25 dmg, 1.25 def), collar.tres (0.8 def, 1.3 cooldown), fish_plush.tres (1.3 hp, 0.8 dmg)
     - Create Resources/Tools/ with throwing_knife.tres (1.5× dmg, 4s cd), short_sword.tres (1.2× dmg, 3s cd), small_mace.tres (2.5× dmg, 8s cd, 12f startup), dreamcatcher.tres (heal 10%, 12s cd)
     - Create Resources/Config/ with boss_phase_1.tres (all 1.0×) and boss_phase_2.tres (1.3× atk speed, 0.5× recover, 1.3× move, 1.5× shockwave)
     - _Requirements: 10.2, 10.3, 10.4, 11.2, 11.3, 11.4, 11.5, 8.3, 8.4, 8.7, 8.8_
 
-  - [ ] 1.4 Implement SaveManager and SettingsManager singletons
+  - [x] 1.4 Implement SaveManager and SettingsManager singletons
     - Implement Scripts/Managers/save_manager.gd with save_game(), load_game(), has_save_data(), delete_save() using JSON serialization to user://
     - Implement SaveData structure matching the design JSON schema (version, current_level, boss_progression, unlocked items, equipped loadout, statistics)
     - Implement Scripts/Managers/settings_manager.gd with all settings properties (fullscreen, resolution, volumes, accessibility options) and save_settings()/load_settings()
     - Handle error cases: write failure retains previous save, corrupted file creates defaults with notification, version mismatch attempts migration
     - _Requirements: 19.1, 19.2, 19.3, 19.4, 19.5, 16.2, 16.3_
 
-  - [ ] 1.5 Implement InputManager singleton
+  - [x] 1.5 Implement InputManager singleton
     - Implement Scripts/Managers/input_manager.gd with device detection (keyboard/controller), rebind_action(), has_conflict(), save/load_bindings()
     - Support all gameplay actions: movement, attack, dodge, tool use, interact, pause
     - Implement conflict detection: warn on duplicate bindings, require confirmation before overwriting
@@ -43,7 +43,7 @@ This plan implements a 2D arcade action game with soulslike combat in Godot Engi
     - Detect controller connect/disconnect and emit device_changed signal
     - _Requirements: 18.1, 18.2, 18.3, 18.4, 18.5, 18.6, 18.7_
 
-  - [ ] 1.6 Implement SceneManager singleton
+  - [x] 1.6 Implement SceneManager singleton
     - Implement Scripts/Managers/scene_manager.gd with transition_to(), reload_current_scene()
     - Implement fade transition effect (ColorRect overlay) with configurable duration (200-500ms)
     - Emit transition_started/transition_completed signals
@@ -70,11 +70,11 @@ This plan implements a 2D arcade action game with soulslike combat in Godot Engi
     - Test that no silent duplicate bindings are ever allowed
     - **Validates: Requirements 18.3, 18.7**
 
-- [ ] 2. Checkpoint - Ensure all tests pass
+- [x] 2. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 3. Core reusable components
-  - [ ] 3.1 Implement HealthComponent
+- [x] 3. Core reusable components
+  - [x] 3.1 Implement HealthComponent
     - Create Scripts/Components/health_component.gd extending Node
     - Properties: current_health, max_health, is_invulnerable
     - Methods: take_damage(amount, source), heal(amount), set_invulnerable(active)
@@ -82,7 +82,7 @@ This plan implements a 2D arcade action game with soulslike combat in Godot Engi
     - Damage is ignored when is_invulnerable is true
     - _Requirements: 1.6, 1.7, 4.3, 8.1_
 
-  - [ ] 3.2 Implement HitboxComponent and HurtboxComponent
+  - [x] 3.2 Implement HitboxComponent and HurtboxComponent
     - Create Scripts/Components/hitbox_component.gd extending Area2D
     - Properties: damage, knockback_force, knockback_direction, hit_stop_frames, screen_shake_intensity
     - Methods: enable(), disable() — controls monitoring and collision shape
@@ -93,7 +93,7 @@ This plan implements a 2D arcade action game with soulslike combat in Godot Engi
     - Set up collision layers: Player Hitbox (Layer 4) → Boss Hurtbox (Layer 7), Boss Hitbox (Layer 6) → Player Hurtbox (Layer 5)
     - _Requirements: 3.4, 9.5, 17.1_
 
-  - [ ] 3.3 Implement CombatManager
+  - [x] 3.3 Implement CombatManager
     - Create Scripts/Combat/combat_manager.gd extending Node (scene-level, not autoload)
     - Method: process_hit(hitbox, hurtbox) — coordinates damage, hit stop, screen shake, knockback
     - Implement apply_hit_stop(duration_frames) — pauses both attacker and defender using process mode
@@ -102,7 +102,7 @@ This plan implements a 2D arcade action game with soulslike combat in Godot Engi
     - Signals: hit_confirmed, hit_stop_started, screen_shake_requested, knockback_applied
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
 
-  - [ ] 3.4 Implement ComboController
+  - [x] 3.4 Implement ComboController
     - Create Scripts/Components/combo_controller.gd extending Node
     - Properties: current_combo_step (0-3), is_in_combo_window
     - Method: advance_combo() → returns true if chain succeeds (within 10-15 frame window, step < 3)
@@ -111,7 +111,7 @@ This plan implements a 2D arcade action game with soulslike combat in Godot Engi
     - Combo window tracked via frame counter set by AnimationPlayer callbacks
     - _Requirements: 3.1, 3.2, 3.3, 3.7_
 
-  - [ ] 3.5 Implement AmuletController
+  - [x] 3.5 Implement AmuletController
     - Create Scripts/Components/amulet_controller.gd extending Node
     - Property: equipped_amulet (AmuletResource or null)
     - Methods: get_damage_modifier(), get_defense_modifier(), get_health_modifier(), get_cooldown_modifier() — return 1.0 if no amulet
@@ -119,7 +119,7 @@ This plan implements a 2D arcade action game with soulslike combat in Godot Engi
     - Lock equip changes during active combat (check GameManager state)
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6, 10.7_
 
-  - [ ] 3.6 Implement ToolController
+  - [x] 3.6 Implement ToolController
     - Create Scripts/Components/tool_controller.gd extending Node
     - Properties: equipped_tool (ToolResource), cooldown_remaining, is_on_cooldown
     - Method: activate_tool() — executes tool effect if not on cooldown, starts cooldown timer
@@ -160,35 +160,35 @@ This plan implements a 2D arcade action game with soulslike combat in Godot Engi
     - **Validates: Requirements 11.6, 11.7**
 
 - [ ] 4. Player character and state machine
-  - [ ] 4.1 Implement PlayerStateMachine and base State class
+  - [x] 4.1 Implement PlayerStateMachine and base State class
     - Create Scripts/Player/player_state_machine.gd with current_state, transition_to(new_state)
     - Create a base State class (Scripts/Player/States/state.gd) with enter(), exit(), process(), physics_process(), handle_input() virtual methods
     - Signal: state_changed(old_state, new_state)
     - Validate transitions per-state (e.g., Attack blocks transition to Run)
     - _Requirements: 1.1_
 
-  - [ ] 4.2 Implement Idle, Run, and movement logic
+  - [x] 4.2 Implement Idle, Run, and movement logic
     - Create Scripts/Player/States/idle_state.gd — transitions to Run on horizontal input, to Attack on attack input, to Dodge on dodge input
     - Create Scripts/Player/States/run_state.gd — transitions to Idle on input release, to Attack on attack input, to Dodge on dodge input
     - Implement movement in player.gd: instant acceleration to 300 px/s, instant deceleration, sprite flip on direction change
     - Use CharacterBody2D.move_and_slide() for all movement
     - _Requirements: 1.2, 1.3, 1.9, 1.10, 2.1, 2.2, 2.3, 2.4_
 
-  - [ ] 4.3 Implement Attack and Recovery states
+  - [x] 4.3 Implement Attack and Recovery states
     - Create Scripts/Player/States/attack_state.gd — blocks transition to Run/Idle until animation completes, uses ComboController to chain attacks
     - Enable/disable HitboxComponent per animation frame via AnimationPlayer keyframes
     - Create Scripts/Player/States/recovery_state.gd — allows transition to Dodge or Run but blocks Attack until recovery animation completes
     - Zero horizontal velocity during Attack and Recovery
     - _Requirements: 1.4, 1.8, 2.6, 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 4.4 Implement Dodge state with I-Frames
+  - [x] 4.4 Implement Dodge state with I-Frames
     - Create Scripts/Player/States/dodge_state.gd — moves defined distance in input/facing direction
     - Grant I-Frames (3-6 physics frames at 60 FPS) by setting HurtboxComponent.is_invulnerable = true
     - Block all other state transitions until dodge animation completes, then transition to Idle
     - Cannot enter Dodge from Attack (active frames) or Hit/Death states
     - _Requirements: 1.5, 1.10, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
 
-  - [ ] 4.5 Implement Hit and Death states
+  - [x] 4.5 Implement Hit and Death states
     - Create Scripts/Player/States/hit_state.gd — entered on damage received, plays hit-reaction animation, transitions to Idle on completion
     - Cancel active combo on entering Hit state (call ComboController.reset_combo())
     - Ignore movement input, apply zero horizontal velocity

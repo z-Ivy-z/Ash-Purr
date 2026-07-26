@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ToolResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Save/tool_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+tool_name = &"small_mace"
+display_name = "Small Mace"
+description = "A heavy melee weapon with devastating power but a long windup and cooldown."
+icon = null
+damage_multiplier = 2.5
+cooldown_seconds = 8.0
+startup_frames = 12
+tool_type = 0
+projectile_scene = null

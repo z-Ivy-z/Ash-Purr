@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AmuletResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Save/amulet_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+amulet_name = &"fish_plush"
+display_name = "Fish Plush"
+description = "A soft toy fish, well-loved. Increases maximum health but reduces damage dealt."
+icon = null
+damage_modifier = 0.8
+defense_modifier = 1.0
+health_modifier = 1.3
+cooldown_modifier = 1.0

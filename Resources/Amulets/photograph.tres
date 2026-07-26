@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="AmuletResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Save/amulet_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+amulet_name = &"photograph"
+display_name = "Photograph of Almohadita"
+description = "A faded photograph of your beloved cat. Increases damage dealt but makes you more vulnerable."
+icon = null
+damage_modifier = 1.25
+defense_modifier = 1.25
+health_modifier = 1.0
+cooldown_modifier = 1.0

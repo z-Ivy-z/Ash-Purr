@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="BossPhaseConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Save/boss_phase_config.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+phase_number = 1
+attack_speed_multiplier = 1.0
+recover_duration_multiplier = 1.0
+movement_speed_multiplier = 1.0
+shockwave_area_multiplier = 1.0
+can_chain_swift_slash = false
+can_double_assault = false
+min_telegraph_frames = 12
