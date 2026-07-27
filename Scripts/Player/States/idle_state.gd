@@ -3,10 +3,13 @@ class_name IdleState extends State
 
 
 func enter() -> void:
-	player.stop_movement()
+	if player:
+		player.stop_movement()
 
 
 func physics_process(_delta: float) -> void:
+	if not player:
+		return
 	# Check for attack input first (higher priority).
 	if Input.is_action_just_pressed("attack"):
 		state_machine.transition_to(PlayerStateMachine.STATE_ATTACK)

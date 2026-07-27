@@ -33,6 +33,10 @@ var ai_enabled: bool = false
 
 
 func _ready() -> void:
+	# Resolve boss reference — fall back to parent if export didn't resolve.
+	if boss == null:
+		boss = get_parent() as CharacterBody2D
+
 	# Register all child BossState nodes by their node name (lowercased).
 	for child in get_children():
 		if child is BossState:
@@ -41,7 +45,18 @@ func _ready() -> void:
 			child.state_machine = self
 			child.boss = boss
 
-	# Enter the initial state.
+	# Defer initial state entry to ensure full scene tree is ready.
+	_enter_initial_state.call_deferred()
+
+
+## Enters the initial state after the full scene tree is ready.
+func _enter_initial_state() -> void:
+	if boss == null:
+		boss = get_parent() as CharacterBody2D
+		for child in get_children():
+			if child is BossState:
+				child.boss = boss
+
 	if _states.has(initial_state):
 		current_state = _states[initial_state]
 		current_state.enter()

@@ -94,8 +94,13 @@ func _activate_ranged() -> void:
 	owner_node.get_parent().add_child(projectile)
 	projectile.global_position = owner_node.global_position
 
-	# Determine facing direction from the owner's scale (negative x = facing left).
-	var facing: float = sign(owner_node.scale.x) if owner_node.scale.x != 0.0 else 1.0
+	# Determine facing direction from the owner's method or fallback to scale.
+	var facing: float = 1.0
+	if owner_node.has_method("get_facing_direction"):
+		facing = owner_node.get_facing_direction()
+	elif owner_node.scale.x != 0.0:
+		facing = signf(owner_node.scale.x)
+
 	if projectile.has_method("set_direction"):
 		projectile.set_direction(Vector2(facing, 0.0))
 	else:

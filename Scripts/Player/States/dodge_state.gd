@@ -19,6 +19,8 @@ var _frame_counter: int = 0
 
 
 func enter() -> void:
+	if not player:
+		return
 	_animation_done = false
 	_frame_counter = 0
 

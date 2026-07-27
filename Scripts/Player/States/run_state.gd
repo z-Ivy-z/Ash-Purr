@@ -4,12 +4,16 @@ class_name RunState extends State
 
 
 func enter() -> void:
+	if not player:
+		return
 	# Apply initial movement on the frame we enter.
 	var direction: float = Input.get_axis("move_left", "move_right")
 	player.apply_movement(direction)
 
 
 func physics_process(_delta: float) -> void:
+	if not player:
+		return
 	# Check for attack input first (higher priority).
 	if Input.is_action_just_pressed("attack"):
 		state_machine.transition_to(PlayerStateMachine.STATE_ATTACK)

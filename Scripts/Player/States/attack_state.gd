@@ -10,6 +10,8 @@ var _waiting_for_combo: bool = false
 
 
 func enter() -> void:
+	if not player:
+		return
 	_animation_done = false
 	_waiting_for_combo = false
 

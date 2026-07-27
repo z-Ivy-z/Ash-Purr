@@ -35,4 +35,6 @@ func _on_area_entered(area: Area2D) -> void:
 	if area is HurtboxComponent:
 		var hurtbox: HurtboxComponent = area as HurtboxComponent
 		if not hurtbox.is_invulnerable:
-			hurtbox.hurt.emit(self)
+			# Apply damage directly since Shockwave is not a HitboxComponent.
+			if hurtbox.health_component:
+				hurtbox.health_component.take_damage(20, self)

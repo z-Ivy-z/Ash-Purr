@@ -20,23 +20,36 @@ const VICTORY_SCREEN_SCENE: String = "res://Scenes/UI/VictoryScreen.tscn"
 
 
 func _ready() -> void:
+	# Defer wiring to ensure all child nodes have completed their _ready().
+	_wire_systems.call_deferred()
+
+
+func _wire_systems() -> void:
 	# Wire combat manager to hitbox/hurtbox signals.
-	player.hurtbox_component.hurt.connect(_on_player_hurt)
-	boss.hurtbox_component.hurt.connect(_on_boss_hurt)
+	if player and player.hurtbox_component:
+		player.hurtbox_component.hurt.connect(_on_player_hurt)
+	if boss and boss.hurtbox_component:
+		boss.hurtbox_component.hurt.connect(_on_boss_hurt)
 
 	# Wire HUD connections.
-	hud.connect_player(player.health_component)
-	hud.connect_boss(boss.health_component, "The Cat Keeper")
-	hud.connect_tool(player.tool_controller)
+	if player and player.health_component:
+		hud.connect_player(player.health_component)
+	if boss and boss.health_component:
+		hud.connect_boss(boss.health_component, "The Cat Keeper")
+	if player and player.tool_controller:
+		hud.connect_tool(player.tool_controller)
 
 	# Wire player death.
-	player.player_died.connect(_on_player_died)
+	if player:
+		player.player_died.connect(_on_player_died)
 
 	# Wire boss defeat.
-	boss.boss_defeated.connect(_on_boss_defeated)
+	if boss:
+		boss.boss_defeated.connect(_on_boss_defeated)
 
 	# Wire phase 2 HUD effect.
-	boss.phase_controller.phase_changed.connect(_on_boss_phase_changed)
+	if boss and boss.phase_controller:
+		boss.phase_controller.phase_changed.connect(_on_boss_phase_changed)
 
 	# Wire dialogue blocking.
 	dialogue_system.dialogue_started.connect(_on_dialogue_started)

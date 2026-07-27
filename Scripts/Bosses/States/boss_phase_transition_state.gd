@@ -7,6 +7,8 @@ var _animation_done: bool = false
 
 
 func enter() -> void:
+	if not boss:
+		return
 	_animation_done = false
 
 	# Boss ignores damage during transition.

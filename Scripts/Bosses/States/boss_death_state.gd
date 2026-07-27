@@ -7,6 +7,8 @@ signal death_animation_finished()
 
 
 func enter() -> void:
+	if not boss:
+		return
 	# Disable AI processing.
 	state_machine.disable_ai()
 

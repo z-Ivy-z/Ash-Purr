@@ -8,6 +8,8 @@ var _animation_done: bool = false
 
 
 func enter() -> void:
+	if not player:
+		return
 	_animation_done = false
 
 	# Cancel any active combo.

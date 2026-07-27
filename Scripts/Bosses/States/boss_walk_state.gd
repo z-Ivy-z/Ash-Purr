@@ -15,6 +15,8 @@ var _walk_timer: float = 0.0
 
 
 func enter() -> void:
+	if not boss:
+		return
 	_walk_timer = 0.0
 	boss.animation_player.play("walk")
 
@@ -24,6 +26,8 @@ func exit() -> void:
 
 
 func physics_process(delta: float) -> void:
+	if not boss:
+		return
 	_walk_timer += delta
 
 	var player_distance: float = boss.get_player_distance()

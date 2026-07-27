@@ -29,6 +29,11 @@ var _states: Dictionary = {}
 
 
 func _ready() -> void:
+	# Resolve the player reference. The export NodePath may not resolve in time
+	# on some engine versions, so fall back to parent lookup.
+	if player == null:
+		player = get_parent() as CharacterBody2D
+
 	# Register all child State nodes by their node name (lowercased as StringName).
 	for child in get_children():
 		if child is State:
@@ -37,7 +42,19 @@ func _ready() -> void:
 			child.state_machine = self
 			child.player = player
 
-	# Enter the initial state.
+	# Defer initial state entry to ensure all sibling nodes (@onready) are ready.
+	_enter_initial_state.call_deferred()
+
+
+## Enters the initial state after the full scene tree is ready.
+func _enter_initial_state() -> void:
+	# Double-check player reference (covers edge cases where export resolved late).
+	if player == null:
+		player = get_parent() as CharacterBody2D
+		for child in get_children():
+			if child is State:
+				child.player = player
+
 	if _states.has(initial_state):
 		current_state = _states[initial_state]
 		current_state.enter()

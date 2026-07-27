@@ -16,10 +16,13 @@ func enter() -> void:
 	_idle_timer = 0.0
 
 	# Play idle animation.
-	boss.animation_player.play("idle")
+	if boss and boss.animation_player:
+		boss.animation_player.play("idle")
 
 
 func physics_process(delta: float) -> void:
+	if not boss:
+		return
 	_idle_timer += delta
 
 	if _idle_timer >= _idle_duration:

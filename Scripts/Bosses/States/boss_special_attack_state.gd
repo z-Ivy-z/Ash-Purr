@@ -23,6 +23,8 @@ var _charge_traveled: float = 0.0
 
 
 func enter() -> void:
+	if not boss:
+		return
 	_phase = 0
 	_frame_counter = 0
 	_animation_done = false

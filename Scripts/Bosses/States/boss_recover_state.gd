@@ -20,6 +20,8 @@ var advanced_combo_multiplier: float = 1.0
 
 
 func enter() -> void:
+	if not boss:
+		return
 	_recover_timer = 0.0
 
 	# Calculate recover duration with phase multiplier.

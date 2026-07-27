@@ -43,6 +43,8 @@ var _was_interrupted: bool = false
 
 
 func enter() -> void:
+	if not boss:
+		return
 	_current_strike = 0
 	_delay_counter = 0
 	_waiting_for_delay = false

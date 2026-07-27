@@ -8,6 +8,8 @@ signal death_animation_finished()
 
 
 func enter() -> void:
+	if not player:
+		return
 	# Zero horizontal velocity.
 	player.stop_movement()
 
