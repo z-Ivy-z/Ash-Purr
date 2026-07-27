@@ -22,17 +22,19 @@ var current_state: State = null
 var _states: Dictionary = {}
 
 ## The CharacterBody2D player node this state machine controls.
-@export var player: CharacterBody2D = null
+## Resolved in _ready via get_parent() — NOT via @export to avoid NodePath issues.
+var player: CharacterBody2D = null
 
 ## The initial state to enter on _ready. Defaults to idle.
 @export var initial_state: StringName = STATE_IDLE
 
 
 func _ready() -> void:
-	# Resolve the player reference. The export NodePath may not resolve in time
-	# on some engine versions, so fall back to parent lookup.
+	# Always resolve player from parent — this is the only reliable method.
+	player = get_parent() as CharacterBody2D
 	if player == null:
-		player = get_parent() as CharacterBody2D
+		push_error("PlayerStateMachine: parent is not a CharacterBody2D!")
+		return
 
 	# Register all child State nodes by their node name (lowercased as StringName).
 	for child in get_children():
@@ -42,19 +44,12 @@ func _ready() -> void:
 			child.state_machine = self
 			child.player = player
 
-	# Defer initial state entry to ensure all sibling nodes (@onready) are ready.
+	# Enter initial state on the next frame to ensure all @onready siblings are ready.
 	_enter_initial_state.call_deferred()
 
 
 ## Enters the initial state after the full scene tree is ready.
 func _enter_initial_state() -> void:
-	# Double-check player reference (covers edge cases where export resolved late).
-	if player == null:
-		player = get_parent() as CharacterBody2D
-		for child in get_children():
-			if child is State:
-				child.player = player
-
 	if _states.has(initial_state):
 		current_state = _states[initial_state]
 		current_state.enter()

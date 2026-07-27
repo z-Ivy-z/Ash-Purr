@@ -42,7 +42,6 @@ shape = SubResource("RectangleShape2D_body")
 
 [node name="PlayerStateMachine" type="Node" parent="."]
 script = ExtResource("2_psm")
-player = NodePath("..")
 initial_state = &"idle"
 
 [node name="Idle" type="Node" parent="PlayerStateMachine"]

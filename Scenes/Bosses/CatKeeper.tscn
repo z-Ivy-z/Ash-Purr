@@ -46,7 +46,6 @@ shape = SubResource("RectangleShape2D_boss_body")
 
 [node name="BossStateMachine" type="Node" parent="."]
 script = ExtResource("2_bsm")
-boss = NodePath("..")
 initial_state = &"idle"
 
 [node name="Idle" type="Node" parent="BossStateMachine"]

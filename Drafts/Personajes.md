@@ -327,3 +327,52 @@ Mimic Strike can chain together two attacks from different bosses before leaving
 
 This final battle puts everything learned throughout the game to the test: dodging, recognizing attack patterns, and taking advantage of brief opportunities to strike, making the final encounter feel like the culmination of every previous boss fight.
 
+
+
+---
+
+# The Garden Golem (First Boss)
+
+## Description
+
+An ancient stone guardian created to protect a sacred garden hidden within the royal lands. Made entirely from ancient stones assembled naturally over centuries, with flowers, moss and vines growing between the cracks of its body. It was not created to conquer or destroy — its only purpose was to care for the flowers, trees and small creatures that lived around it. When the kingdom began to fall, it was manipulated into believing Bob was the one threatening its garden.
+
+## Appearance
+
+A massive creature (~3x Bob's height) formed from warm grey stones. Green moss and colorful flowers grow between the cracks. Glowing green eyes carved into a simple stone head. Moves slowly but with incredible power. Every step makes the earth feel like it's moving.
+
+## Difficulty
+
+★☆☆☆☆
+
+## Attacks
+
+### Basic
+
+#### Stone Fist
+Slams the ground with its massive fist, creating a shockwave.
+
+#### Push Back
+When the player stays too close, shoves Bob away with great force.
+
+### Special
+
+#### 🔹 Rising Stone Platform
+Creates a stone platform beneath Bob that rises and collapses.
+
+#### 🔹 Toxic Garden Mist
+Releases poisonous clouds around the arena.
+
+#### 🔹 Thrown Rocks
+Throws small rocks in a parabolic arc toward the player.
+
+#### 🔹 Root Awakening
+Causes roots to emerge from the ground and chase Bob.
+
+## Second Phase (50% Health)
+
+Flowers bloom abundantly on its body. Poison becomes stronger. Platforms appear more frequently. Recovery between attacks is shorter. Attacking during phase transition is punished with poison burst.
+
+## Purpose
+
+Teaches positioning, patience, reading patterns, and not being greedy. The push mechanic specifically punishes button mashing. First boss — introduces core combat loop.

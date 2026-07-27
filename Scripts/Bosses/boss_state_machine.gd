@@ -23,7 +23,8 @@ var current_state: BossState = null
 var _states: Dictionary = {}
 
 ## The CharacterBody2D boss node this state machine controls.
-@export var boss: CharacterBody2D = null
+## Resolved via get_parent() in _ready — NOT via @export.
+var boss: CharacterBody2D = null
 
 ## The initial state to enter on _ready.
 @export var initial_state: StringName = STATE_IDLE
@@ -33,9 +34,11 @@ var ai_enabled: bool = false
 
 
 func _ready() -> void:
-	# Resolve boss reference — fall back to parent if export didn't resolve.
+	# Always resolve boss from parent.
+	boss = get_parent() as CharacterBody2D
 	if boss == null:
-		boss = get_parent() as CharacterBody2D
+		push_error("BossStateMachine: parent is not a CharacterBody2D!")
+		return
 
 	# Register all child BossState nodes by their node name (lowercased).
 	for child in get_children():
@@ -45,18 +48,12 @@ func _ready() -> void:
 			child.state_machine = self
 			child.boss = boss
 
-	# Defer initial state entry to ensure full scene tree is ready.
+	# Enter initial state on the next frame.
 	_enter_initial_state.call_deferred()
 
 
 ## Enters the initial state after the full scene tree is ready.
 func _enter_initial_state() -> void:
-	if boss == null:
-		boss = get_parent() as CharacterBody2D
-		for child in get_children():
-			if child is BossState:
-				child.boss = boss
-
 	if _states.has(initial_state):
 		current_state = _states[initial_state]
 		current_state.enter()

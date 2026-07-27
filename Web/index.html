@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ash & Purr</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1a2e; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+canvas { display: block; image-rendering: pixelated; }
+#fullscreen-btn { position: fixed; top: 10px; right: 10px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 6px 14px; font: 12px monospace; cursor: pointer; border-radius: 4px; z-index: 100; }
+#fullscreen-btn:hover { background: rgba(255,255,255,0.3); }
+</style>
+</head>
+<body>
+<button id="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+<canvas id="game"></canvas>
+<script>
+function toggleFullscreen() {
+  const el = document.documentElement;
+  if (!document.fullscreenElement) { el.requestFullscreen().catch(()=>{}); }
+  else { document.exitFullscreen(); }
+}
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('fullscreen-btn');
+  btn.textContent = document.fullscreenElement ? '⛶ Exit Fullscreen' : '⛶ Fullscreen';
+});
+</script>
+<script src="game.js"></script>
+<script src="white_lion.js"></script>
+</body>
+</html>

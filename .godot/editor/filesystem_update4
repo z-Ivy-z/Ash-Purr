@@ -1,5 +1,0 @@
-res://Scripts/Bosses/boss_state_machine.gd
-res://Scripts/Player/player_state_machine.gd
-res://Scripts/Player/States/idle_state.gd
-res://Scripts/Components/tool_controller.gd
-res://Scripts/Levels/arena_cat_keeper.gd

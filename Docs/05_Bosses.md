@@ -789,3 +789,90 @@ Every future boss added to the game must satisfy four requirements:
 4. Make the player feel like a tiny knight overcoming impossible odds through mastery rather than power.
 
 If a boss cannot accomplish these four goals, it does not belong in **Ash & Purr**.
+
+
+---
+
+# The Garden Golem (First Boss)
+
+## Story
+
+An ancient stone guardian created to protect a sacred garden within the royal lands. Made entirely from stones assembled over centuries, with flowers, moss and vines growing between the cracks of its body. It was not created to conquer or destroy — its only purpose was to care for the flowers, trees and small creatures that lived around it.
+
+When darkness spread across the kingdom, the golem was manipulated into believing that Bob was the one threatening its garden. It fights not out of hatred, but out of a misguided desire to protect the only thing it loves.
+
+## Personality
+
+Gentle, patient and peaceful outside of combat. When provoked, its protective instincts awaken and the same hands that carefully tended flowers become weapons capable of destroying stone and earth. Even during combat, the golem never appears cruel — it simply believes it has no other choice.
+
+## Difficulty
+
+★☆☆☆☆
+
+## Combat Identity
+
+The Garden Golem controls the battlefield through environmental attacks and slow powerful movements. It does not chase Bob constantly. Instead, it changes the arena around him, creating dangerous zones that force movement. Actively retreats when the player gets too close, punishing greed with a powerful push attack.
+
+## Fighting Style
+
+Slow but extremely powerful. Heavily telegraphed attacks that punish careless positioning. The fight rewards awareness, patience, and reading attack patterns. Players must avoid hazards while waiting for the brief openings after the golem's attacks.
+
+## Attacks
+
+### Stone Fist (Basic)
+Raises one massive arm before slamming its fist into the ground. Creates a small shockwave. Damage: 12 (P1), 15 (P2).
+
+### Push Back
+When the player stays too close for too long (2 consecutive hits), the golem immediately shoves Bob away with great force. Damage: 7 (P1), 10 (P2). Also causes the golem to retreat.
+
+### Rising Stone Platform
+Creates a stone platform beneath Bob that rises into the air, carrying him upward. If Bob doesn't jump off in time, the platform collapses and he falls for heavy damage (18). Phase 2 creates a second platform nearby.
+
+### Toxic Garden Mist
+Releases poisonous clouds (2-3 in P1, 4-5 in P2) at different locations around the arena. Standing inside drains HP continuously. Poison is stronger in Phase 2 (6 HP/sec vs 3 HP/sec).
+
+### Thrown Rocks
+Throws 3-5 small rocks in an arc toward the player. Rocks travel with gravity (parabolic trajectory). Damage: 7 (P1), 10 (P2).
+
+### Root Awakening (Phase 2 only in normal rotation)
+Places both hands into the ground, causing enormous roots to emerge and chase Bob, limiting movement and creating danger zones.
+
+## Second Phase (50% Health)
+
+Cracks appear across the golem's body. Flowers bloom abundantly over its stone form (visual indicator). The golem becomes desperate — it believes the garden is dying.
+
+Changes:
+- Push Back triggers after only 2 hits (same as P1 in current implementation)
+- Rising Stone Platform appears more frequently with a second platform
+- Toxic Mist creates more clouds with stronger poison (6 HP/sec) and larger radius
+- Thrown Rocks fires 5 instead of 3
+- Root Awakening becomes available and covers more area
+- Recovery time between attacks significantly reduced
+- Golem moves slightly faster between attacks
+- Attacking during phase transition is punished with poison burst + push
+
+Despite becoming stronger, its attacks remain readable. It is not becoming evil — it is becoming afraid.
+
+## Arena
+
+The Sacred Garden — the most beautiful and intact location in the game. Blue sky, green trees, colorful flowers, broken stone paths with moss between tiles, grass tufts. Represents the earliest area of the kingdom, least affected by corruption.
+
+## Gameplay Purpose
+
+Teaches players:
+- Good positioning
+- Patience
+- Reading attack patterns
+- Avoiding environmental hazards
+- Not being greedy (push mechanic punishes button mashing)
+- Jumping to escape platforms
+
+## Narrative Purpose
+
+The encounter shows Bob that not every enemy is truly evil. The Garden Golem is a protector whose kindness has been weaponized. After defeat, it realizes Bob was never its enemy. Victory should feel like freeing a guardian from a false duty.
+
+## Defeat Dialogue
+
+"...the flowers... they are not afraid of you."
+"I was wrong. You are not the enemy."
+"Go, little one. I am sorry."
