@@ -1,0 +1,115 @@
+[gd_scene load_steps=21 format=3 uid="uid://c5catkeeper_scene01"]
+
+[ext_resource type="Script" path="res://Scripts/Bosses/cat_keeper.gd" id="1_boss"]
+[ext_resource type="Script" path="res://Scripts/Bosses/boss_state_machine.gd" id="2_bsm"]
+[ext_resource type="Script" path="res://Scripts/Bosses/States/boss_idle_state.gd" id="3_idle"]
+[ext_resource type="Script" path="res://Scripts/Bosses/States/boss_walk_state.gd" id="4_walk"]
+[ext_resource type="Script" path="res://Scripts/Bosses/States/boss_attack_state.gd" id="5_attack"]
+[ext_resource type="Script" path="res://Scripts/Bosses/States/boss_combo_state.gd" id="6_combo"]
+[ext_resource type="Script" path="res://Scripts/Bosses/States/boss_recover_state.gd" id="7_recover"]
+[ext_resource type="Script" path="res://Scripts/Bosses/States/boss_special_attack_state.gd" id="8_special"]
+[ext_resource type="Script" path="res://Scripts/Bosses/States/boss_phase_transition_state.gd" id="9_phase_trans"]
+[ext_resource type="Script" path="res://Scripts/Bosses/States/boss_death_state.gd" id="10_death"]
+[ext_resource type="Script" path="res://Scripts/Components/health_component.gd" id="11_health"]
+[ext_resource type="Script" path="res://Scripts/Components/hitbox_component.gd" id="12_hitbox"]
+[ext_resource type="Script" path="res://Scripts/Components/hurtbox_component.gd" id="13_hurtbox"]
+[ext_resource type="Script" path="res://Scripts/Bosses/phase_controller.gd" id="14_phase"]
+[ext_resource type="Script" path="res://Scripts/Bosses/attack_selector.gd" id="15_selector"]
+[ext_resource type="Script" path="res://Scripts/Components/stagger_controller.gd" id="16_stagger"]
+[ext_resource type="Resource" path="res://Resources/Config/boss_phase_1.tres" id="17_p1"]
+[ext_resource type="Resource" path="res://Resources/Config/boss_phase_2.tres" id="18_p2"]
+[ext_resource type="Script" path="res://Scripts/Bosses/boss_animations_placeholder.gd" id="19_placeholder_anim"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_body"]
+size = Vector2(40, 72)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_hitbox"]
+size = Vector2(56, 56)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_boss_hurtbox"]
+size = Vector2(36, 64)
+
+
+[node name="CatKeeper" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1_boss")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.9, 0.2, 0.2, 1.0)
+polygon = PackedVector2Array(-20, -36, 20, -36, 20, 36, -20, 36)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_boss_body")
+
+[node name="BossStateMachine" type="Node" parent="."]
+script = ExtResource("2_bsm")
+boss = NodePath("..")
+initial_state = &"idle"
+
+[node name="Idle" type="Node" parent="BossStateMachine"]
+script = ExtResource("3_idle")
+
+[node name="Walk" type="Node" parent="BossStateMachine"]
+script = ExtResource("4_walk")
+
+[node name="Attack" type="Node" parent="BossStateMachine"]
+script = ExtResource("5_attack")
+
+[node name="Combo" type="Node" parent="BossStateMachine"]
+script = ExtResource("6_combo")
+
+[node name="Recover" type="Node" parent="BossStateMachine"]
+script = ExtResource("7_recover")
+
+[node name="Special_attack" type="Node" parent="BossStateMachine"]
+script = ExtResource("8_special")
+
+[node name="Phase_transition" type="Node" parent="BossStateMachine"]
+script = ExtResource("9_phase_trans")
+
+[node name="Death" type="Node" parent="BossStateMachine"]
+script = ExtResource("10_death")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("11_health")
+max_health = 500
+
+[node name="HitboxComponent" type="Area2D" parent="."]
+collision_layer = 32
+collision_mask = 16
+monitoring = false
+script = ExtResource("12_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HitboxComponent"]
+position = Vector2(-28, 0)
+disabled = true
+shape = SubResource("RectangleShape2D_boss_hitbox")
+
+[node name="HurtboxComponent" type="Area2D" parent="."]
+collision_layer = 64
+collision_mask = 264
+script = ExtResource("13_hurtbox")
+health_component = NodePath("../HealthComponent")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent"]
+shape = SubResource("RectangleShape2D_boss_hurtbox")
+
+[node name="PhaseController" type="Node" parent="."]
+script = ExtResource("14_phase")
+phase_1_config = ExtResource("17_p1")
+phase_2_config = ExtResource("18_p2")
+
+[node name="AttackSelector" type="Node" parent="."]
+script = ExtResource("15_selector")
+phase_controller = NodePath("../PhaseController")
+
+[node name="StaggerController" type="Node" parent="."]
+script = ExtResource("16_stagger")
+health_component = NodePath("../HealthComponent")
+phase_controller = NodePath("../PhaseController")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+script = ExtResource("19_placeholder_anim")

@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://c5checkpoint_scene01"]
+
+[ext_resource type="Script" path="res://Scripts/Checkpoints/checkpoint.gd" id="1_cp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_checkpoint"]
+size = Vector2(64, 96)
+
+[node name="Checkpoint" type="Area2D"]
+collision_layer = 128
+collision_mask = 2
+script = ExtResource("1_cp")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_checkpoint")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="NotificationLabel" type="Label" parent="."]
+offset_top = -60.0
+offset_right = 120.0
+offset_bottom = -40.0
+horizontal_alignment = 1
+text = "Progress Saved"

@@ -24,13 +24,17 @@ var _facing_direction: float = 1.0
 
 
 func _ready() -> void:
+	add_to_group("player")
 	# Connect health component signals.
 	health_component.died.connect(_on_died)
 	# HurtboxComponent.hurt is handled by CombatManager in the scene,
 	# which then calls state_machine.transition_to(hit) after processing.
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
+	# Apply gravity.
+	if not is_on_floor():
+		velocity.y += 980.0 * delta
 	move_and_slide()
 
 

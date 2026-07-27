@@ -1,0 +1,41 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5dialogue_scene01"]
+
+[ext_resource type="Script" path="res://Scripts/UI/dialogue_system.gd" id="1_dialogue"]
+
+[node name="DialogueSystem" type="CanvasLayer"]
+layer = 15
+script = ExtResource("1_dialogue")
+
+[node name="DialogueWindow" type="PanelContainer" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 100.0
+offset_top = -180.0
+offset_right = -100.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="DialogueWindow"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="HBoxContainer" type="HBoxContainer" parent="DialogueWindow/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Portrait" type="TextureRect" parent="DialogueWindow/MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="TextLabel" type="RichTextLabel" parent="DialogueWindow/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+bbcode_enabled = true
+text = ""
+visible_characters = 0

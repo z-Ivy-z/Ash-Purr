@@ -1,0 +1,157 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5settings_scene01"]
+
+[ext_resource type="Script" path="res://Scripts/UI/settings_menu.gd" id="1_settings"]
+
+[node name="SettingsMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_settings")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -250.0
+offset_right = 300.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TabContainer" type="TabContainer" parent="Panel"]
+layout_mode = 2
+
+[node name="Audio" type="MarginContainer" parent="Panel/TabContainer"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Panel/TabContainer/Audio"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MasterLabel" type="Label" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+text = "Master Volume"
+
+[node name="MasterSlider" type="HSlider" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.1
+value = 1.0
+
+[node name="MusicLabel" type="Label" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+text = "Music Volume"
+
+[node name="MusicSlider" type="HSlider" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.1
+value = 0.8
+
+[node name="SFXLabel" type="Label" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+text = "SFX Volume"
+
+[node name="SFXSlider" type="HSlider" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.1
+value = 1.0
+
+[node name="UILabel" type="Label" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+text = "UI Volume"
+
+[node name="UISlider" type="HSlider" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.1
+value = 0.7
+
+[node name="AmbienceLabel" type="Label" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+text = "Ambience Volume"
+
+[node name="AmbienceSlider" type="HSlider" parent="Panel/TabContainer/Audio/VBox"]
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.1
+value = 0.6
+
+[node name="Accessibility" type="MarginContainer" parent="Panel/TabContainer"]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Panel/TabContainer/Accessibility"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CameraShakeToggle" type="CheckButton" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+button_pressed = true
+text = "Camera Shake"
+
+[node name="ShakeLabel" type="Label" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+text = "Shake Intensity"
+
+[node name="CameraShakeSlider" type="HSlider" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.1
+value = 1.0
+
+[node name="FlashLabel" type="Label" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+text = "Hit Flash Intensity"
+
+[node name="HitFlashSlider" type="HSlider" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+min_value = 0.0
+max_value = 1.0
+step = 0.1
+value = 1.0
+
+[node name="ScaleLabel" type="Label" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+text = "UI Scale"
+
+[node name="UIScaleOption" type="OptionButton" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+
+[node name="SubLabel" type="Label" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+text = "Subtitle Size"
+
+[node name="SubtitleSizeOption" type="OptionButton" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+
+[node name="SubtitleBgToggle" type="CheckButton" parent="Panel/TabContainer/Accessibility/VBox"]
+layout_mode = 2
+text = "Subtitle Background"
+
+[node name="BackButton" type="Button" parent="Panel"]
+layout_mode = 2
+size_flags_vertical = 8
+text = "Back"

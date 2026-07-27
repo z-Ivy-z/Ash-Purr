@@ -1,0 +1,63 @@
+[gd_scene load_steps=2 format=3 uid="uid://c5hud_scene01"]
+
+[ext_resource type="Script" path="res://Scripts/UI/hud.gd" id="1_hud"]
+
+[node name="HUD" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_hud")
+
+[node name="PlayerHealthContainer" type="HBoxContainer" parent="."]
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 320.0
+offset_bottom = 60.0
+
+[node name="PlayerHealthBar" type="ProgressBar" parent="PlayerHealthContainer"]
+custom_minimum_size = Vector2(200, 24)
+layout_mode = 2
+size_flags_vertical = 4
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="ToolIcon" type="TextureRect" parent="PlayerHealthContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="CooldownOverlay" type="TextureProgressBar" parent="PlayerHealthContainer/ToolIcon"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+fill_mode = 4
+show_percentage = false
+
+[node name="AmuletIcon" type="TextureRect" parent="PlayerHealthContainer"]
+custom_minimum_size = Vector2(32, 32)
+layout_mode = 2
+stretch_mode = 5
+
+[node name="BossHealthContainer" type="VBoxContainer" parent="."]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 20.0
+offset_right = 200.0
+offset_bottom = 70.0
+grow_horizontal = 2
+
+[node name="BossNameLabel" type="Label" parent="BossHealthContainer"]
+layout_mode = 2
+horizontal_alignment = 1
+text = "The Cat Keeper"
+
+[node name="BossHealthBar" type="ProgressBar" parent="BossHealthContainer"]
+custom_minimum_size = Vector2(400, 20)
+layout_mode = 2
+max_value = 500.0
+value = 500.0
+show_percentage = false

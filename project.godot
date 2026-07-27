@@ -3,16 +3,21 @@
 ; since the parameters that go here are not all obvious.
 ;
 ; Format:
-;   [section] key=value
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 
 [application]
 
 config/name="Ash & Purr"
 config/description="2D arcade action game with soulslike combat featuring a single boss encounter."
-run/main_scene=""
-config/features=PackedStringArray("4.3", "Forward Plus")
+run/main_scene="res://Scenes/UI/MainMenu.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
@@ -84,7 +89,3 @@ advance_dialogue={
 2d_physics/layer_7="Boss Hurtbox"
 2d_physics/layer_8="Checkpoints"
 2d_physics/layer_9="Projectiles"
-
-[rendering]
-
-renderer/rendering_method="forward_plus"

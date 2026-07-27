@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://c5player_scene01"]
+[gd_scene load_steps=19 format=3 uid="uid://c5player_scene01"]
 
 [ext_resource type="Script" path="res://Scripts/Player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://Scripts/Player/player_state_machine.gd" id="2_psm"]
@@ -15,6 +15,7 @@
 [ext_resource type="Script" path="res://Scripts/Components/combo_controller.gd" id="13_combo"]
 [ext_resource type="Script" path="res://Scripts/Components/tool_controller.gd" id="14_tool"]
 [ext_resource type="Script" path="res://Scripts/Components/amulet_controller.gd" id="15_amulet"]
+[ext_resource type="Script" path="res://Scripts/Player/player_animations_placeholder.gd" id="16_placeholder_anim"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
 size = Vector2(32, 64)
@@ -31,6 +32,10 @@ collision_mask = 1
 script = ExtResource("1_player")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
+
+[node name="Visual" type="Polygon2D" parent="."]
+color = Color(0.2, 0.6, 1.0, 1.0)
+polygon = PackedVector2Array(-16, -32, 16, -32, 16, 32, -16, 32)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_body")
@@ -97,3 +102,4 @@ health_component = NodePath("../HealthComponent")
 script = ExtResource("15_amulet")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+script = ExtResource("16_placeholder_anim")
