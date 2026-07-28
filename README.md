@@ -10,6 +10,8 @@
 
 **Equipo: Los Tuxidos**
 
+Mira como funciona: https://drive.google.com/file/d/1FpsAgqvgoq4KVb9EkewsPRjDhQ-Zjn4S/view?usp=sharing 
+
 Este proyecto fue desarrollado como parte del **Reto 1 - Videojuegos** en la Hackaton de Kiro organizada por Codigo Facilito: *"Desarrolla el videojuego que siempre quisiste crear. Enfrenta el desafio, combina logica, matematicas, graficos, audio, teoria de juegos, y mucho mas con la ayuda de Kiro."*
 
 Ash & Purr es el resultado de ese reto: un boss rush soulslike en 2D construido desde cero con HTML5 Canvas y JavaScript puro, combinando sistemas de combate con fisica, animaciones procedurales, IA de jefes con maquinas de estados, sistema de audio dinamico, y diseño de niveles — todo desarrollado con la asistencia de Kiro como herramienta de desarrollo.
