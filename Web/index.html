@@ -14,6 +14,7 @@ canvas { display: block; image-rendering: pixelated; }
 </head>
 <body>
 <button id="fullscreen-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+<button id="skip-boss-btn" onclick="skipBoss()" style="position:fixed;top:10px;left:10px;background:rgba(255,50,50,0.3);color:#fff;border:1px solid rgba(255,100,100,0.5);padding:6px 14px;font:12px monospace;cursor:pointer;border-radius:4px;z-index:100;">⏭ Skip Boss</button>
 <canvas id="game"></canvas>
 <script>
 function toggleFullscreen() {

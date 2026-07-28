@@ -56,11 +56,20 @@ function updateLion(dt) {
   lion.x += lion.vx * dt; lion.y += lion.vy * dt;
   if (lion.y >= FLOOR_Y) { lion.y = FLOOR_Y; lion.vy = 0; }
   lion.x = clamp(lion.x, 50, canvas.width - 50);
+
+  // Update lioness if active
+  if (lioness.active) updateLioness(dt);
 }
 
 function lionIdle(dt) {
   lion.vx = 0; lion.castTimer += dt;
   const interval = lion.phase === 2 ? 0.9 : 1.4;
+  // Quick swipe if player is very close
+  if (Math.abs(player.x - lion.x) < 70 && lion.castTimer > 0.3) {
+    lion.castTimer = 0;
+    lion.castType = 'heavy_claw'; lion.state = 'attack'; lion.stateTimer = 0; lion.comboCount = 0;
+    return;
+  }
   if (lion.castTimer >= interval) { lion.castTimer = 0; lionChooseAction(); }
 }
 
@@ -126,12 +135,13 @@ function lionPounce(dt) {
     if (!lion._landed) {
       lion._landed = true;
       lion.vx = 0;
-      screenShake(8, 0.15);
-      spawnParticles(lion.x, FLOOR_Y, 10, '#C8C0B0', 150);
-      const landHitbox = {x: lion.x - 50, y: FLOOR_Y - 50, w: 100, h: 50};
+      screenShake(10, 0.2);
+      spawnParticles(lion.x, FLOOR_Y, 12, '#C8C0B0', 180);
+      const landHitbox = {x: lion.x - 70, y: FLOOR_Y - 60, w: 140, h: 60}; // +40% area
       if (rectOverlap(landHitbox, {x:player.x-player.w/2, y:player.y-player.h, w:player.w, h:player.h})) {
-        damagePlayer(18, lion.facing);
+        damagePlayer(22, lion.facing); // +20% (was 18)
       }
+      sfxGolemSlam(); // Heavy landing sound
       lion.pounceCount++;
       if (lion.phase === 2 && lion.pounceCount < 2 && Math.abs(player.x - lion.x) > 100) {
         lion.stateTimer = 0; lion._pounced = false; lion._landed = false; // Reset for chain
@@ -150,16 +160,16 @@ function lionRoar(dt) {
     // Telegraph: planting paws
     lion.maneShake = Math.sin(lion.stateTimer * 20) * 3;
   } else if (lion.stateTimer >= 0.6 && lion.stateTimer < 0.65) {
-    // Roar shockwave
+    // Roar shockwave — 40% larger area, 20% more damage
     sfxLionRoar();
     screenShake(6, 0.15);
-    const roarRadius = lion.phase === 2 ? 120 : 90;
+    const roarRadius = lion.phase === 2 ? 168 : 126; // +40% (was 120/90)
     const dist = Math.abs(player.x - lion.x);
     if (dist < roarRadius && player.y >= FLOOR_Y - 50) {
-      damagePlayer(8, player.x < lion.x ? -1 : 1);
-      player.vx = (player.x < lion.x ? -1 : 1) * 300;
+      damagePlayer(10, player.x < lion.x ? -1 : 1); // +20% (was 8)
+      player.vx = (player.x < lion.x ? -1 : 1) * 350;
     }
-    spawnParticles(lion.x, lion.y - 40, 12, '#EDE5D5', 180);
+    spawnParticles(lion.x, lion.y - 40, 15, '#EDE5D5', 200);
   } else if (lion.stateTimer >= 1.0) {
     // P2: Follow-up charge after roar
     if (lion.roarFollowUp) {
@@ -185,23 +195,42 @@ function lionPhaseTransition(dt) {
     lion.invulnerable = false; lion.state = 'idle'; lion.stateTimer = 0; lion.maneShake = 0;
     screenShake(10, 0.3); spawnParticles(lion.x, lion.y-40, 20, '#D4A030', 200);
     sfxBossSlam(); stopMusic(); startMusic();
+    // Activate the lioness mate
+    lioness.active = true;
+    lioness.x = lion.x > canvas.width/2 ? 150 : canvas.width - 150;
+    lioness.state = 'idle'; lioness.stateTimer = 0; lioness.castTimer = 0.5;
+    spawnParticles(lioness.x, FLOOR_Y - 30, 10, '#C8B8A0', 120);
+    sfxLionRoar();
   }
 }
 
 // --- DAMAGE CHECK ---
 function checkLionHit() {
   if (!player.attackHitbox || lion.invulnerable || lion.state === 'dead') return;
+  let hit = false;
+
+  // Check hit on lion
   const lRect = {x: lion.x - lion.w/2, y: lion.y - lion.h, w: lion.w, h: lion.h};
-  if (rectOverlap(player.attackHitbox, lRect)) {
+  if (rectOverlap(player.attackHitbox, lRect)) { hit = true; }
+
+  // Check hit on lioness (shares HP bar)
+  if (!hit && lioness.active) {
+    const lnRect = {x: lioness.x - lioness.w/2, y: FLOOR_Y - lioness.h, w: lioness.w, h: lioness.h};
+    if (rectOverlap(player.attackHitbox, lnRect)) { hit = true; }
+  }
+
+  if (hit) {
     const baseDmg = player.comboStep === 3 ? 14 : 8;
     const dmg = Math.round(baseDmg * equippedAmulet.dmgMod);
-    lion.hp -= dmg;
+    lion.hp -= dmg; // Shared HP bar
+    if (lion.hp < 0) lion.hp = 0;
     stats.damageDealt += dmg; stats.hits++;
     player._hitConnected = true;
-    spawnParticles(lion.x, lion.y - 40, 5, '#F5F0E8', 100);
+    spawnParticles(player.attackHitbox.x + player.attackHitbox.w/2, player.attackHitbox.y + player.attackHitbox.h/2, 5, '#F5F0E8', 100);
     screenShake(2, 0.06); sfxHit();
     if (lion.hp <= 0) {
       lion.hp = 0; lion.state = 'dead'; lion.stateTimer = 0;
+      lioness.active = false;
       screenShake(12, 0.4); spawnParticles(lion.x, lion.y-40, 25, '#EDE5D5', 250);
     }
   }
@@ -273,46 +302,67 @@ function drawLion() {
   ctx.beginPath(); ctx.moveTo(f*18,-43+crouching); ctx.lineTo(f*22,-35+crouching); ctx.stroke();
 
   ctx.restore();
+
+  // Draw lioness if active
+  drawLioness();
 }
 
 // --- LION ARENA ---
 function drawLionArena() {
-  // Royal Garden — overgrown, beautiful, melancholic
+  // Royal Palace Garden — polished, elegant, fine architecture
   const grad = ctx.createLinearGradient(0,0,0,FLOOR_Y);
-  grad.addColorStop(0, '#5588AA'); grad.addColorStop(0.5, '#7BAABB'); grad.addColorStop(1, '#557755');
+  grad.addColorStop(0, '#6699BB'); grad.addColorStop(0.4, '#88BBCC'); grad.addColorStop(1, '#AABBAA');
   ctx.fillStyle = grad; ctx.fillRect(0,0,canvas.width,FLOOR_Y);
 
-  // Large trees
-  ctx.fillStyle = '#3A6040';
-  for (let i = 0; i < 5; i++) { const tx = 60+i*200; ctx.beginPath(); ctx.ellipse(tx, FLOOR_Y-140, 35, 60, 0, 0, Math.PI*2); ctx.fill(); }
-  ctx.fillStyle = '#4A3020';
-  for (let i = 0; i < 5; i++) { const tx = 60+i*200; ctx.fillRect(tx-5, FLOOR_Y-80, 10, 80); }
+  // Elegant palace columns
+  ctx.fillStyle = '#E8E0D8';
+  ctx.fillRect(60, FLOOR_Y-180, 16, 180); ctx.fillRect(canvas.width-76, FLOOR_Y-180, 16, 180);
+  ctx.fillRect(200, FLOOR_Y-150, 12, 150); ctx.fillRect(canvas.width-212, FLOOR_Y-150, 12, 150);
+  // Column capitals
+  ctx.fillStyle = '#D4C8B8';
+  ctx.fillRect(54, FLOOR_Y-185, 28, 8); ctx.fillRect(canvas.width-82, FLOOR_Y-185, 28, 8);
+  ctx.fillRect(195, FLOOR_Y-155, 22, 6); ctx.fillRect(canvas.width-217, FLOOR_Y-155, 22, 6);
+  // Golden trim on columns
+  ctx.fillStyle = '#D4A030';
+  ctx.fillRect(54, FLOOR_Y-178, 28, 3); ctx.fillRect(canvas.width-82, FLOOR_Y-178, 28, 3);
 
-  // Broken marble fountain (center)
-  ctx.fillStyle = '#AAAAAA'; ctx.fillRect(canvas.width/2-25, FLOOR_Y-40, 50, 40);
-  ctx.fillStyle = '#999999'; ctx.beginPath(); ctx.ellipse(canvas.width/2, FLOOR_Y-40, 30, 8, 0, 0, Math.PI*2); ctx.fill();
-  // Cracked
-  ctx.strokeStyle = '#777'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(canvas.width/2-10,FLOOR_Y-35); ctx.lineTo(canvas.width/2-5,FLOOR_Y-20); ctx.stroke();
+  // Elegant arch
+  ctx.strokeStyle = '#E8E0D8'; ctx.lineWidth = 8;
+  ctx.beginPath(); ctx.arc(canvas.width/2, FLOOR_Y-160, 160, Math.PI, 0); ctx.stroke();
+  // Gold trim on arch
+  ctx.strokeStyle = '#D4A030'; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(canvas.width/2, FLOOR_Y-160, 155, Math.PI, 0); ctx.stroke();
 
-  // Flowers blooming
+  // Ornamental hedges (trimmed perfectly)
+  ctx.fillStyle = '#4A8855';
+  ctx.fillRect(80, FLOOR_Y-30, 80, 30); ctx.fillRect(canvas.width-160, FLOOR_Y-30, 80, 30);
+  ctx.fillStyle = '#3A7044';
+  ctx.beginPath(); ctx.ellipse(120, FLOOR_Y-30, 40, 15, 0, Math.PI, 0); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(canvas.width-120, FLOOR_Y-30, 40, 15, 0, Math.PI, 0); ctx.fill();
+
+  // Rose bushes
   const t = lion.animTimer;
-  for (let i = 0; i < 12; i++) {
-    const fx = (i*83+30) % canvas.width, fy = FLOOR_Y - 4 - Math.sin(t*0.4+i)*2;
-    ctx.fillStyle = ['#FF8899','#FFBB55','#AADDFF','#FFEE66'][i%4];
-    ctx.beginPath(); ctx.arc(fx, fy, 2.5, 0, Math.PI*2); ctx.fill();
+  for (let i = 0; i < 8; i++) {
+    const fx = 90 + (i < 4 ? i*20 : (canvas.width-170+(i-4)*20));
+    const fy = FLOOR_Y - 32 - Math.sin(t*0.3+i)*1;
+    ctx.fillStyle = i%2===0 ? '#CC4455' : '#FFAACC';
+    ctx.beginPath(); ctx.arc(fx, fy, 3, 0, Math.PI*2); ctx.fill();
   }
 
-  // Overgrown stone path
-  ctx.fillStyle = '#6A6A5A'; ctx.fillRect(0, FLOOR_Y, canvas.width, 80);
-  ctx.fillStyle = '#7A7A6A'; for (let x=0;x<canvas.width;x+=55) ctx.fillRect(x+2,FLOOR_Y,50,3);
-  // Grass between stones
-  ctx.fillStyle = '#5A8A4A'; for (let x=0;x<canvas.width;x+=40) { ctx.fillRect(x+48,FLOOR_Y-2,3,5); }
+  // Polished marble floor
+  ctx.fillStyle = '#D8D0C8'; ctx.fillRect(0, FLOOR_Y, canvas.width, 80);
+  ctx.fillStyle = '#C8C0B8'; for (let x=0;x<canvas.width;x+=64) ctx.fillRect(x, FLOOR_Y, 60, 2);
+  ctx.fillStyle = '#E8E4E0'; for (let x=32;x<canvas.width;x+=64) ctx.fillRect(x, FLOOR_Y+3, 28, 1);
 
-  // Sleeping Almohadita on platform (background element)
-  ctx.fillStyle = '#888888'; ctx.fillRect(canvas.width/2-20, FLOOR_Y-55, 40, 8);
-  ctx.fillStyle = '#CCCCCC'; ctx.beginPath(); ctx.ellipse(canvas.width/2, FLOOR_Y-60, 8, 5, 0, 0, Math.PI*2); ctx.fill(); // Cat body
-  ctx.fillStyle = '#888888'; ctx.beginPath(); ctx.ellipse(canvas.width/2-5, FLOOR_Y-62, 3, 3, 0, 0, Math.PI*2); ctx.fill(); // Head
+  // Central ornamental fountain (intact, elegant)
+  ctx.fillStyle = '#E0D8D0'; ctx.fillRect(canvas.width/2-20, FLOOR_Y-45, 40, 45);
+  ctx.fillStyle = '#D4CCC4'; ctx.beginPath(); ctx.ellipse(canvas.width/2, FLOOR_Y-45, 25, 7, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#88BBDD'; ctx.beginPath(); ctx.ellipse(canvas.width/2, FLOOR_Y-43, 15, 4, 0, 0, Math.PI*2); ctx.fill(); // Water
+
+  // Sleeping Almohadita on velvet cushion
+  ctx.fillStyle = '#882244'; ctx.beginPath(); ctx.ellipse(canvas.width/2, FLOOR_Y-52, 12, 5, 0, 0, Math.PI*2); ctx.fill(); // Cushion
+  ctx.fillStyle = '#CCCCCC'; ctx.beginPath(); ctx.ellipse(canvas.width/2, FLOOR_Y-55, 7, 4, 0, 0, Math.PI*2); ctx.fill(); // Cat
+  ctx.fillStyle = '#999999'; ctx.beginPath(); ctx.ellipse(canvas.width/2-4, FLOOR_Y-57, 3, 2.5, 0, 0, Math.PI*2); ctx.fill(); // Head
 }
 
 // --- RESET ---
@@ -323,4 +373,100 @@ function resetLion() {
   lion.castTimer=0; lion.comboCount=0; lion.pounceCount=0;
   lion.maneShake=0; lion.animTimer=0; lion.roarFollowUp=false;
   lion._pounced=false; lion._landed=false;
+  resetLioness();
+}
+
+// ============================================================
+// THE LIONESS (Phase 2 companion) — darker, more furious
+// ============================================================
+const lioness = {
+  x: 200, y: FLOOR_Y, w: 50, h: 65,
+  vx: 0, facing: 1, active: false,
+  state: 'idle', stateTimer: 0, castTimer: 0,
+  animTimer: 0, comboCount: 0,
+};
+
+function updateLioness(dt) {
+  if (!lioness.active || lion.state === 'dead') return;
+  lioness.stateTimer += dt; lioness.animTimer += dt;
+  lioness.facing = player.x < lioness.x ? -1 : 1;
+
+  switch (lioness.state) {
+    case 'idle':
+      lioness.vx = 0; lioness.castTimer += dt;
+      if (lioness.castTimer >= 1.5) { lioness.castTimer = 0; lionessChooseAction(); }
+      break;
+    case 'approach':
+      lioness.vx = lioness.facing * 180;
+      if (Math.abs(player.x - lioness.x) < 100 || lioness.stateTimer > 1.2) { lioness.vx = 0; lioness.state = 'idle'; lioness.stateTimer = 0; }
+      break;
+    case 'attack':
+      lioness.vx = 0;
+      if (lioness.stateTimer >= 0.2) {
+        lioness.stateTimer = 0; lioness.comboCount++;
+        sfxLadySlash();
+        const hx = lioness.x + lioness.facing * 45;
+        const hitbox = {x: hx-30, y: FLOOR_Y-55, w: 60, h: 55};
+        if (rectOverlap(hitbox, {x:player.x-player.w/2,y:player.y-player.h,w:player.w,h:player.h})) {
+          damagePlayer(9, lioness.facing);
+        }
+        spawnParticles(hx, FLOOR_Y-30, 3, '#B0A898', 80);
+        if (lioness.comboCount >= 2) { lioness.state = 'idle'; lioness.stateTimer = 0; lioness.comboCount = 0; lioness.castTimer = 0.8; }
+      }
+      break;
+    case 'pounce':
+      if (lioness.stateTimer < 0.4) { lioness.vx = 0; }
+      else if (lioness.stateTimer >= 0.4 && lioness.stateTimer < 0.45) {
+        lioness.vx = lioness.facing * 500; sfxBossStrike();
+      }
+      if (lioness.stateTimer >= 0.8) {
+        lioness.vx = 0;
+        const hitbox = {x: lioness.x-40, y:FLOOR_Y-45, w:80, h:45};
+        if (rectOverlap(hitbox, {x:player.x-player.w/2,y:player.y-player.h,w:player.w,h:player.h})) {
+          damagePlayer(14, lioness.facing);
+        }
+        spawnParticles(lioness.x, FLOOR_Y, 6, '#B0A898', 120);
+        screenShake(4, 0.1);
+        lioness.state = 'idle'; lioness.stateTimer = 0; lioness.castTimer = 1.0;
+      }
+      break;
+  }
+  lioness.x += lioness.vx * dt;
+  lioness.x = clamp(lioness.x, 50, canvas.width - 50);
+}
+
+function lionessChooseAction() {
+  const dist = Math.abs(player.x - lioness.x);
+  if (dist > 200) { lioness.state = 'pounce'; lioness.stateTimer = 0; }
+  else if (dist > 100) { lioness.state = 'approach'; lioness.stateTimer = 0; }
+  else { lioness.state = 'attack'; lioness.stateTimer = 0; lioness.comboCount = 0; }
+}
+
+function drawLioness() {
+  if (!lioness.active || lion.state === 'dead') return;
+  ctx.save(); ctx.translate(lioness.x, FLOOR_Y + Math.sin(lioness.animTimer*3)*1.5);
+  ctx.globalAlpha = 0.95;
+  const f = lioness.facing;
+  // Darker lion — the furious mate
+  ctx.strokeStyle='#C8B8A0'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(-f*20,-20); ctx.quadraticCurveTo(-f*35,-40,-f*30,-52); ctx.stroke();
+  ctx.fillStyle='#D0C8B8'; ctx.beginPath(); ctx.ellipse(0,-35,26,18,0,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#A09888'; ctx.beginPath(); ctx.ellipse(0,-28,22,8,0,0,Math.PI); ctx.fill();
+  ctx.fillStyle='#D0C8B8'; ctx.fillRect(f*10-4,-16,8,18); ctx.fillRect(f*18-4,-16,8,18);
+  ctx.fillStyle='#4A4A4A'; ctx.fillRect(f*10-3,-1,6,3); ctx.fillRect(f*18-3,-1,6,3);
+  // Head (no mane, sleeker)
+  ctx.fillStyle='#D0C8B8'; ctx.beginPath(); ctx.ellipse(f*8,-48,11,10,0,0,Math.PI*2); ctx.fill();
+  // Angry eyes — red tint
+  ctx.fillStyle='#CC6620'; ctx.fillRect(f*5,-50,3,3); ctx.fillRect(f*11,-50,3,3);
+  ctx.shadowColor='#CC6620'; ctx.shadowBlur=5;
+  ctx.fillRect(f*5,-50,3,3); ctx.fillRect(f*11,-50,3,3);
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#4A4A4A'; ctx.beginPath(); ctx.ellipse(f*8,-44,2.5,1.5,0,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+}
+
+function resetLioness() {
+  lioness.x = 200; lioness.vx = 0; lioness.active = false;
+  lioness.state = 'idle'; lioness.stateTimer = 0; lioness.castTimer = 0;
+  lioness.comboCount = 0; lioness.animTimer = 0;
 }

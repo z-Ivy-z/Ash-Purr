@@ -36,7 +36,7 @@ const FLOOR_Y = 460;
 const PLAYER_SPEED = 300;
 const DODGE_SPEED = 600;
 const DODGE_DURATION = 0.2;
-const DODGE_COOLDOWN = 0.5;
+const DODGE_COOLDOWN = 0.36;
 const JUMP_FORCE = -550;
 
 // --- AUDIO SYSTEM ---
@@ -281,13 +281,188 @@ function mouseJustLeft() { return mouseJustFrame.left; }
 function mouseJustRight() { return mouseJustFrame.right; }
 
 // --- GAME STATE ---
-let gameState = 'menu'; // menu, cinematic, equip, intro, playing, midequip, death, victory
+let gameState = 'title'; // title, menu, cinematic, equip, intro, playing, midequip, death, victory, final_cinematic
 let equippedAmulet = AMULETS[0];
 let equippedTool = TOOLS[0];
 let equipSelection = 0; // 0=amulets tab, 1=tools tab
 let equipCursor = 0;
 let toolCooldown = 0;
 let toolMaxCooldown = 0;
+
+// --- LANGUAGE / i18n SYSTEM ---
+let currentLang = 'en'; // 'en' or 'es'
+const LANG = {
+  en: {
+    title: 'ASH & PURR',
+    subtitle: 'A Soulslike Boss Rush',
+    newGame: '[ NEW GAME ]',
+    language: 'Language: English',
+    controls: 'LClick:Attack | RClick:Jump | SPACE:Dodge | K:Tool | A/D:Move',
+    pressEnter: '[ Press ENTER to Start ]',
+    retry: '[ R ] Retry',
+    mainMenu: '[ M ] Main Menu',
+    youLose: 'YOU LOSE',
+    gitGud: 'GIT GUD',
+    battleStats: '— BATTLE STATISTICS —',
+    time: 'Time',
+    damageDealt: 'Damage Dealt',
+    damageTaken: 'Damage Taken',
+    hitsLanded: 'Hits Landed',
+    dodges: 'Dodges',
+    toolUses: 'Tool Uses',
+    maxCombo: 'Max Combo',
+    lastBreath: 'Last Breath',
+    yes: 'YES',
+    no: 'No',
+    hits: 'hits',
+    victory: 'VICTORY — ALL ENEMIES DEFEATED',
+    victorySubtitle: 'The cats are free once more.',
+    continueKey: '[ ENTER ] Continue',
+    skipKey: 'Press ENTER or SPACE to skip',
+    equipTitle: 'EQUIPMENT',
+    amulets: 'AMULETS',
+    tools: 'TOOLS',
+    startFight: '[ SPACE ] Start Fight',
+    bossDefeated: 'DEFEATED',
+    nextEnemy: 'Next: ',
+    changeTool: '[ ENTER ] Select | [ SPACE ] Continue',
+    none: 'None',
+    noneDescAmulet: 'No amulet equipped.',
+    noneDescTool: 'No tool equipped.',
+    golemIntro: ["...", "The flowers... they are afraid.", "You... you are the one hurting them.", "I will not let you destroy my garden."],
+    golemDefeat: ["...the flowers... they are not afraid of you.", "I was wrong. You are not the enemy.", "Go, little one. I am sorry."],
+    ladyIntro: ["...", "You survived the garden. Impressive.", "But I am not a golem bound by sentiment.", "I am Lady Death. And I never fail a contract."],
+    ladyDefeat: ["...how? No one has ever...", "Perhaps I underestimated your determination.", "Go. But know this — what awaits you is far beyond blades."],
+    lionIntro: ["A deep growl echoes through the garden.", "A massive white lion stands between you and Almohadita.", "He looks back at the sleeping cat... then at you.", "His eyes hold no hatred. Only determination."],
+    lionDefeat: ["The lion slowly rises one final time.", "He looks at Almohadita... then at you.", "For the first time, he steps aside.", "He trusts you to do what he no longer can."],
+    spiritIntro: ["...another soul, wandering where it should not.", "I was once a mage who swore to protect the innocent.", "Now I am bound here... forced to stop anyone who passes.", "Forgive me, little knight. I have no choice."],
+    spiritDefeat: ["...free. At last, I am free.", "Thank you, little knight. Go... save your friend.", "But beware. The one ahead truly believes he is righteous."],
+    keeperIntro: ["So... you defeated even the spirit.", "I am the Cat Keeper. The kingdom's greatest sword.", "My king ordered me to protect this creature with my life.", "I will not fail him. Not even for someone as brave as you.", "Come then, little one. Show me your resolve."],
+    keeperDefeat: ["...impossible. A branch... defeated the kingdom's champion?", "Perhaps... I was wrong. Perhaps my king was never truly mine.", "Take him. Take your cat home. You have earned it."],
+    cinematic: [
+      { text: "Bob has been searching for a long time.", delay: 2.5 },
+      { text: "His best friend, Almohadita, was taken from him.", delay: 2.5 },
+      { text: "Every clue... every trail... has led him here.", delay: 2.5 },
+      { text: "To this strange, forgotten place.", delay: 2.2 },
+      { text: "", delay: 1.0 },
+      { text: "Something tells him his friend is close.", delay: 2.5 },
+      { text: "He can feel it.", delay: 1.8 },
+      { text: "", delay: 1.0 },
+      { text: "He will not stop.", delay: 1.8 },
+      { text: "He will not turn back.", delay: 1.8 },
+      { text: "He will do whatever it takes to bring Almohadita home.", delay: 3.0 },
+    ],
+    finalCinematic: [
+      { text: "", delay: 1.5, speaker: null },
+      { text: "So... you actually made it.", delay: 2.5, speaker: "???" },
+      { text: "How amusing.", delay: 2.0, speaker: "The Unknown One" },
+      { text: "You defeated my little collection of puppets.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "The spirit who never found rest...", delay: 2.5, speaker: "The Unknown One" },
+      { text: "The assassin who only follows gold...", delay: 2.5, speaker: "The Unknown One" },
+      { text: "The beast blinded by love...", delay: 2.5, speaker: "The Unknown One" },
+      { text: "And my greatest puppet... the honorable fool.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "", delay: 1.0, speaker: null },
+      { text: "They all danced for me. Every single one.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "And you... a tiny knight with a stick.", delay: 2.5, speaker: "The Unknown One" },
+      { text: "Do you think this changes anything?", delay: 2.5, speaker: "The Unknown One" },
+      { text: "", delay: 1.0, speaker: null },
+      { text: "Your precious cat... is mine.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "And what I will do with him...", delay: 2.5, speaker: "The Unknown One" },
+      { text: "...will make everything you fought for meaningless.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "", delay: 1.0, speaker: null },
+      { text: "Come find me, little knight.", delay: 2.5, speaker: "The Unknown One" },
+      { text: "I will be waiting.", delay: 2.0, speaker: "The Unknown One" },
+      { text: "And I will enjoy watching you fail.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "", delay: 2.0, speaker: null },
+    ],
+  },
+  es: {
+    title: 'ASH & PURR',
+    subtitle: 'Un Boss Rush Soulslike',
+    newGame: '[ NUEVA PARTIDA ]',
+    language: 'Idioma: Español',
+    controls: 'Click Izq:Atacar | Click Der:Saltar | ESPACIO:Esquivar | K:Herramienta | A/D:Mover',
+    pressEnter: '[ Presiona ENTER para Iniciar ]',
+    retry: '[ R ] Reintentar',
+    mainMenu: '[ M ] Menú Principal',
+    youLose: 'PERDISTE',
+    gitGud: 'GIT GUD',
+    battleStats: '— ESTADÍSTICAS DE BATALLA —',
+    time: 'Tiempo',
+    damageDealt: 'Daño Realizado',
+    damageTaken: 'Daño Recibido',
+    hitsLanded: 'Golpes Acertados',
+    dodges: 'Esquivas',
+    toolUses: 'Usos de Herramienta',
+    maxCombo: 'Combo Máximo',
+    lastBreath: 'Último Aliento',
+    yes: 'SÍ',
+    no: 'No',
+    hits: 'golpes',
+    victory: 'VICTORIA — TODOS LOS ENEMIGOS DERROTADOS',
+    victorySubtitle: 'Los gatos son libres una vez más.',
+    continueKey: '[ ENTER ] Continuar',
+    skipKey: 'Presiona ENTER o ESPACIO para saltar',
+    equipTitle: 'EQUIPAMIENTO',
+    amulets: 'AMULETOS',
+    tools: 'HERRAMIENTAS',
+    startFight: '[ ESPACIO ] Iniciar Combate',
+    bossDefeated: 'DERROTADO',
+    nextEnemy: 'Siguiente: ',
+    changeTool: '[ ENTER ] Seleccionar | [ ESPACIO ] Continuar',
+    none: 'Ninguno',
+    noneDescAmulet: 'Sin amuleto equipado.',
+    noneDescTool: 'Sin herramienta equipada.',
+    golemIntro: ["...", "Las flores... tienen miedo.", "Tú... tú eres quien las lastima.", "No dejaré que destruyas mi jardín."],
+    golemDefeat: ["...las flores... no te tienen miedo.", "Estaba equivocado. No eres el enemigo.", "Ve, pequeño. Lo siento."],
+    ladyIntro: ["...", "Sobreviviste al jardín. Impresionante.", "Pero yo no soy un golem atado al sentimentalismo.", "Soy Lady Death. Y nunca fallo un contrato."],
+    ladyDefeat: ["...¿cómo? Nadie jamás ha...", "Quizás subestimé tu determinación.", "Ve. Pero lo que te espera va más allá de las cuchillas."],
+    lionIntro: ["Un profundo rugido retumba en el jardín.", "Un enorme león blanco se interpone entre tú y Almohadita.", "Mira al gato dormido... y luego a ti.", "Sus ojos no guardan odio. Solo determinación."],
+    lionDefeat: ["El león se levanta lentamente una última vez.", "Mira a Almohadita... y luego a ti.", "Por primera vez, se hace a un lado.", "Confía en que harás lo que él ya no puede."],
+    spiritIntro: ["...otra alma, vagando donde no debería.", "Alguna vez fui un mago que juró proteger a los inocentes.", "Ahora estoy atado aquí... obligado a detener a quien pase.", "Perdóname, pequeño caballero. No tengo opción."],
+    spiritDefeat: ["...libre. Al fin, soy libre.", "Gracias, pequeño caballero. Ve... salva a tu amigo.", "Pero cuidado. El que está adelante cree que es justo."],
+    keeperIntro: ["Así que... derrotaste incluso al espíritu.", "Soy el Cat Keeper. La mejor espada del reino.", "Mi rey me ordenó proteger a esta criatura con mi vida.", "No le fallaré. Ni siquiera por alguien tan valiente como tú.", "Ven entonces, pequeño. Muéstrame tu determinación."],
+    keeperDefeat: ["...imposible. ¿Una rama... derrotó al campeón del reino?", "Quizás... estaba equivocado. Quizás mi rey nunca fue realmente mío.", "Llévatelo. Lleva a tu gato a casa. Te lo has ganado."],
+    cinematic: [
+      { text: "Bob ha estado buscando durante mucho tiempo.", delay: 2.5 },
+      { text: "Su mejor amigo, Almohadita, le fue arrebatado.", delay: 2.5 },
+      { text: "Cada pista... cada rastro... lo ha traído aquí.", delay: 2.5 },
+      { text: "A este extraño lugar olvidado.", delay: 2.2 },
+      { text: "", delay: 1.0 },
+      { text: "Algo le dice que su amigo está cerca.", delay: 2.5 },
+      { text: "Puede sentirlo.", delay: 1.8 },
+      { text: "", delay: 1.0 },
+      { text: "No se detendrá.", delay: 1.8 },
+      { text: "No dará marcha atrás.", delay: 1.8 },
+      { text: "Hará lo que sea necesario para traer a Almohadita de vuelta.", delay: 3.0 },
+    ],
+    finalCinematic: [
+      { text: "", delay: 1.5, speaker: null },
+      { text: "Así que... realmente lo lograste.", delay: 2.5, speaker: "???" },
+      { text: "Qué divertido.", delay: 2.0, speaker: "The Unknown One" },
+      { text: "Derrotaste a mi pequeña colección de títeres.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "El espíritu que nunca encontró descanso...", delay: 2.5, speaker: "The Unknown One" },
+      { text: "La asesina que solo sigue al oro...", delay: 2.5, speaker: "The Unknown One" },
+      { text: "La bestia cegada por el amor...", delay: 2.5, speaker: "The Unknown One" },
+      { text: "Y mi mejor títere... el honorable tonto.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "", delay: 1.0, speaker: null },
+      { text: "Todos bailaron para mí. Cada uno de ellos.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "Y tú... un pequeño caballero con un palo.", delay: 2.5, speaker: "The Unknown One" },
+      { text: "¿Crees que esto cambia algo?", delay: 2.5, speaker: "The Unknown One" },
+      { text: "", delay: 1.0, speaker: null },
+      { text: "Tu preciado gato... es mío.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "Y lo que haré con él...", delay: 2.5, speaker: "The Unknown One" },
+      { text: "...hará que todo por lo que luchaste no tenga sentido.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "", delay: 1.0, speaker: null },
+      { text: "Ven a buscarme, pequeño caballero.", delay: 2.5, speaker: "The Unknown One" },
+      { text: "Estaré esperando.", delay: 2.0, speaker: "The Unknown One" },
+      { text: "Y disfrutaré viéndote fracasar.", delay: 3.0, speaker: "The Unknown One" },
+      { text: "", delay: 2.0, speaker: null },
+    ],
+  }
+};
+function T(key) { return LANG[currentLang][key] || LANG.en[key] || key; }
+let titleTimer = 0; // For title screen animation
 
 let introLines = [];
 let introSpeaker = '';
@@ -351,6 +526,34 @@ const CINEMATIC_LINES = [
   { text: "He will not turn back.", delay: 1.8 },
   { text: "He will do whatever it takes to bring Almohadita home.", delay: 3.0 },
 ];
+
+// --- FINAL CINEMATIC (The Unknown One) ---
+const FINAL_CINEMATIC_LINES = [
+  { text: "", delay: 1.5, speaker: null },
+  { text: "So... you actually made it.", delay: 2.5, speaker: "???" },
+  { text: "How amusing.", delay: 2.0, speaker: "The Unknown One" },
+  { text: "You defeated my little collection of puppets.", delay: 3.0, speaker: "The Unknown One" },
+  { text: "The spirit who never found rest...", delay: 2.5, speaker: "The Unknown One" },
+  { text: "The assassin who only follows gold...", delay: 2.5, speaker: "The Unknown One" },
+  { text: "The beast blinded by love...", delay: 2.5, speaker: "The Unknown One" },
+  { text: "And my greatest puppet... the honorable fool.", delay: 3.0, speaker: "The Unknown One" },
+  { text: "", delay: 1.0, speaker: null },
+  { text: "They all danced for me. Every single one.", delay: 3.0, speaker: "The Unknown One" },
+  { text: "And you... a tiny knight with a stick.", delay: 2.5, speaker: "The Unknown One" },
+  { text: "Do you think this changes anything?", delay: 2.5, speaker: "The Unknown One" },
+  { text: "", delay: 1.0, speaker: null },
+  { text: "Your precious cat... is mine.", delay: 3.0, speaker: "The Unknown One" },
+  { text: "And what I will do with him...", delay: 2.5, speaker: "The Unknown One" },
+  { text: "...will make everything you fought for meaningless.", delay: 3.0, speaker: "The Unknown One" },
+  { text: "", delay: 1.0, speaker: null },
+  { text: "Come find me, little knight.", delay: 2.5, speaker: "The Unknown One" },
+  { text: "I will be waiting.", delay: 2.0, speaker: "The Unknown One" },
+  { text: "And I will enjoy watching you fail.", delay: 3.0, speaker: "The Unknown One" },
+  { text: "", delay: 2.0, speaker: null },
+];
+let finalCinematicIndex = 0;
+let finalCinematicTimer = 0;
+let finalCinematicAlpha = 0;
 let cinematicIndex = 0;
 let cinematicTimer = 0;
 let cinematicAlpha = 0;
@@ -433,7 +636,7 @@ let transitionTimer = 0;
 
 // --- THE GARDEN GOLEM ---
 const golem = {
-  x: 700, y: FLOOR_Y, w: 56, h: 90,
+  x: 700, y: FLOOR_Y, w: 64, h: 100,
   vx: 0, vy: 0, facing: -1,
   hp: 280, maxHp: 280,
   state: 'idle', stateTimer: 0, phase: 1,
@@ -720,7 +923,7 @@ function activateTool() {
         const hitbox = { x: hx-30, y: player.y-55, w: 60, h: 55 };
         const bossRect = { x: boss.x-boss.w/2, y: boss.y-boss.h, w: boss.w, h: boss.h };
         if (!boss.invulnerable && boss.state !== 'death' && rectOverlap(hitbox, bossRect)) {
-          boss.hp -= dmg; spawnParticles(boss.x,boss.y-40,8,tool.color,150); screenShake(5,0.12); sfxHit();
+          boss.hp -= dmg; if (boss.hp < 0) boss.hp = 0; spawnParticles(boss.x,boss.y-40,8,tool.color,150); screenShake(5,0.12); sfxHit();
           if (boss.hp<=0){boss.hp=0;boss.state='death';boss.stateTimer=0;victoryTimer=3;screenShake(15,0.5);}
         }
         spawnParticles(hx, player.y-30, 6, tool.color, 120);
@@ -744,7 +947,7 @@ function activateTool() {
       const hitbox = { x: hx-30, y: player.y-55, w: 60, h: 55 };
       const bossRect = { x: boss.x-boss.w/2, y: boss.y-boss.h, w: boss.w, h: boss.h };
       if (!boss.invulnerable && boss.state !== 'death' && rectOverlap(hitbox, bossRect)) {
-        boss.hp -= dmg; spawnParticles(boss.x,boss.y-40,10,'#FFD700',180); sfxHit();
+        boss.hp -= dmg; if (boss.hp < 0) boss.hp = 0; spawnParticles(boss.x,boss.y-40,10,'#FFD700',180); sfxHit();
         if (boss.hp<=0){boss.hp=0;boss.state='death';boss.stateTimer=0;victoryTimer=3;screenShake(15,0.5);}
       }
     }
@@ -879,6 +1082,7 @@ function checkPlayerHit() {
     const baseDmg = player.comboStep === 3 ? 14 : 8; // Reduced damage
     const dmg = Math.round(baseDmg * equippedAmulet.dmgMod);
     boss.hp -= dmg;
+    if (boss.hp < 0) boss.hp = 0;
     stats.damageDealt += dmg; stats.hits++;
     player._hitConnected = true;
     spawnParticles(boss.x, boss.y-40, 6, COLORS.armorHighlight, 120);
@@ -1271,7 +1475,7 @@ function updateLady(dt) {
   for (let i = lady.daggers.length-1; i >= 0; i--) {
     const d = lady.daggers[i]; d.x += d.vx * dt; d.y += d.vy * dt; d.life -= dt;
     if (!d.hasHit && rectOverlap({x:d.x-5,y:d.y-5,w:10,h:10},{x:player.x-player.w/2,y:player.y-player.h,w:player.w,h:player.h})) {
-      d.hasHit = true; damagePlayer(6, d.vx > 0 ? 1 : -1);
+      d.hasHit = true; damagePlayer(2, d.vx > 0 ? 1 : -1);
     }
     if (d.life <= 0 || d.x < -20 || d.x > canvas.width+20) lady.daggers.splice(i, 1);
   }
@@ -1279,19 +1483,23 @@ function updateLady(dt) {
 
 function ladyIdle(dt) {
   lady.vx = 0; lady.castTimer += dt;
-  const interval = lady.phase === 2 ? 0.35 : 0.6;
+  const interval = lady.phase === 2 ? 0.42 : 0.72;
   if (lady.castTimer >= interval) { lady.castTimer = 0; ladyChooseAction(); }
 }
 
 function ladyChooseAction() {
   const dist = Math.abs(player.x - lady.x);
   if (dist > 200) {
-    // Far: throw daggers or shadow step to close distance
-    if (Math.random() < 0.5) { lady.state = 'shadow_step'; lady.stateTimer = 0; lady.shadowChains = 0; }
-    else { lady.state = 'throw'; lady.stateTimer = 0; }
+    // Far: walk toward player, or throw daggers, or (less often) shadow step
+    const r = Math.random();
+    if (r < 0.25) { lady.state = 'shadow_step'; lady.stateTimer = 0; lady.shadowChains = 0; }
+    else if (r < 0.5) { lady.state = 'throw'; lady.stateTimer = 0; }
+    else { lady.state = 'approach'; lady.stateTimer = 0; }
   } else if (dist > 100) {
-    // Mid: approach or shadow step
-    if (Math.random() < 0.4) { lady.state = 'shadow_step'; lady.stateTimer = 0; lady.shadowChains = 0; }
+    // Mid: approach or shadow step (reduced) or throw
+    const r = Math.random();
+    if (r < 0.2) { lady.state = 'shadow_step'; lady.stateTimer = 0; lady.shadowChains = 0; }
+    else if (r < 0.45) { lady.state = 'throw'; lady.stateTimer = 0; }
     else { lady.state = 'approach'; lady.stateTimer = 0; }
   } else {
     // Close: attack combo
@@ -1304,8 +1512,12 @@ function ladyChooseAction() {
 
 function ladyApproach(dt) {
   lady.vx = lady.facing * 220;
-  if (Math.abs(player.x - lady.x) < 90 || lady.stateTimer > 0.8) {
-    lady.vx = 0; lady.state = 'idle'; lady.stateTimer = 0; lady.castTimer = lady.phase === 2 ? 0.2 : 0.4;
+  // Walk toward player until in attack range
+  if (Math.abs(player.x - lady.x) < 80) {
+    lady.vx = 0; lady.state = 'idle'; lady.stateTimer = 0; lady.castTimer = lady.phase === 2 ? 0.15 : 0.3;
+  }
+  if (lady.stateTimer > 1.2) {
+    lady.vx = 0; lady.state = 'idle'; lady.stateTimer = 0; lady.castTimer = 0;
   }
 }
 
@@ -1323,7 +1535,7 @@ function ladyAttack(dt) {
     const hx = lady.x + lady.facing * 40;
     const hitbox = {x: hx-25, y: lady.y-50, w: 50, h: 50};
     if (rectOverlap(hitbox, {x:player.x-player.w/2,y:player.y-player.h,w:player.w,h:player.h})) {
-      const dmg = lady.castType === 'twin_slash' ? 10 : 8;
+      const dmg = lady.castType === 'twin_slash' ? 7 : 6;
       damagePlayer(dmg, lady.facing);
     }
     spawnParticles(hx, lady.y-30, 2, '#CCCCDD', 80);
@@ -1332,7 +1544,7 @@ function ladyAttack(dt) {
       if (lady.phase === 2 && lady.castType === 'twin_slash') {
         const spinHitbox = {x: lady.x-45, y: lady.y-55, w: 90, h: 55};
         if (rectOverlap(spinHitbox, {x:player.x-player.w/2,y:player.y-player.h,w:player.w,h:player.h})) {
-          damagePlayer(12, lady.facing);
+          damagePlayer(8, lady.facing);
         }
         spawnParticles(lady.x, lady.y-30, 8, '#882233', 120);
         screenShake(3, 0.08);
@@ -1359,7 +1571,7 @@ function ladyShadowStep(dt) {
     const hx = lady.x + lady.facing * 35;
     const hitbox = {x: hx-20, y: lady.y-45, w: 40, h: 45};
     if (rectOverlap(hitbox, {x:player.x-player.w/2,y:player.y-player.h,w:player.w,h:player.h})) {
-      damagePlayer(10, lady.facing);
+      damagePlayer(5, lady.facing);
     }
     spawnParticles(hx, lady.y-30, 3, '#CCCCDD', 80);
     lady.armAngle = 1.0;
@@ -1383,7 +1595,7 @@ function ladyThrow(dt) {
     for (let i = 0; i < count; i++) {
       const spread = lady.phase === 2 ? (i - 2) * 0.2 : (i - 1) * 0.15;
       const angle = baseAngle + spread;
-      lady.daggers.push({ x: lady.x, y: lady.y-30, vx: Math.cos(angle)*450, vy: Math.sin(angle)*450, life: 2, hasHit: false });
+      lady.daggers.push({ x: lady.x, y: lady.y-30, vx: Math.cos(angle)*360, vy: Math.sin(angle)*360, life: 2, hasHit: false });
     }
     spawnParticles(lady.x, lady.y-30, 4, '#CCCCDD', 60);
     lady.armAngle = 0.6;
@@ -1412,6 +1624,7 @@ function checkLadyHit() {
     const baseDmg = player.comboStep === 3 ? 14 : 8;
     const dmg = Math.round(baseDmg * equippedAmulet.dmgMod);
     lady.hp -= dmg;
+    if (lady.hp < 0) lady.hp = 0;
     stats.damageDealt += dmg; stats.hits++;
     player._hitConnected = true;
     spawnParticles(lady.x, lady.y-30, 5, '#882233', 100);
@@ -1446,13 +1659,10 @@ function updateGolem(dt) {
     case 'phase_transition': golemPhaseTransition(dt); break;
   }
 
-  // Movement: actively retreat if player is too close, approach if too far
+  // Movement: only approach if player is too far (golem never retreats)
   const dist = Math.abs(player.x - golem.x);
   if (golem.state === 'idle' || golem.state === 'recover') {
-    if (dist < 100) {
-      // Back away from player — like boss/spirit maintaining distance
-      golem.vx = (player.x < golem.x ? 1 : -1) * 120;
-    } else if (dist > 250) {
+    if (dist > 250) {
       golem.vx = golem.facing * 80;
     } else {
       golem.vx = 0;
@@ -1508,15 +1718,15 @@ function executeGolemAttack() {
 }
 
 function golemPushBack() {
-  // Powerful shove that sends Bob flying if he's close
+  // Fast shove that sends Bob flying
   sfxBossSlam();
   golem.armAngle = 0.8;
   screenShake(5, 0.12);
   const pushDir = player.x < golem.x ? -1 : 1;
-  const hitbox = {x: golem.x - 50, y: golem.y - 70, w: 100, h: 70};
+  const hitbox = {x: golem.x - 80, y: golem.y - 80, w: 160, h: 80};
   if (rectOverlap(hitbox, {x:player.x-player.w/2, y:player.y-player.h, w:player.w, h:player.h})) {
-    player.vx = pushDir * 500;
-    player.vy = -200;
+    player.vx = pushDir * 600;
+    player.vy = -220;
     player.onGround = false;
     const dmg = golem.phase === 2 ? 10 : 7;
     player.hp -= dmg;
@@ -1524,12 +1734,18 @@ function golemPushBack() {
     playerDamageFlash = 0.3;
     sfxPlayerHit();
     spawnParticles(player.x, player.y - 30, 8, '#8A8070', 150);
-    if (player.hp <= 0) { player.hp = 0; player.state = 'death'; player.stateTimer = 0; sfxDeath(); }
+    if (player.hp <= 0) {
+      player.hp = 0;
+      if (lastBreathAvailable) {
+        lastBreathAvailable = false; lastBreathActive = true; lastBreathTimer = 0;
+        stats.usedLastBreath = true;
+        player.state = 'death'; player.stateTimer = 0; sfxDeath();
+      } else {
+        player.state = 'death'; player.stateTimer = 0; deathTimer = 2.0; sfxDeath();
+      }
+    }
   }
   spawnParticles(golem.x, golem.y - 40, 6, '#6B5A42', 100);
-  // Golem retreats away from player after push (like boss/spirit repositioning)
-  golem.vx = -pushDir * 200;
-  setTimeout(() => { golem.vx = 0; }, 400);
 }
 
 function golemStoneFist() {
@@ -1631,10 +1847,10 @@ function updateGolemHazards(dt) {
   for (let i = golem.platforms.length-1; i >= 0; i--) {
     const p = golem.platforms[i]; p.timer += dt;
     const rise = Math.min(p.timer / p.maxTime, 1) * 60;
-    const pw = golem.phase === 2 ? 55 : 40;
+    const pw = golem.phase === 2 ? 70 : 55;
 
     // If Bob is standing on the platform, carry him upward
-    if (player.onGround && Math.abs(player.x - p.x) < pw/2 + 5 && p.timer < p.maxTime) {
+    if (player.onGround && Math.abs(player.x - p.x) < pw/2 + 8 && p.timer < p.maxTime) {
       player.y = FLOOR_Y - rise - 12;
       player.onGround = true;
       player.vy = 0;
@@ -1642,7 +1858,7 @@ function updateGolemHazards(dt) {
 
     if (p.timer >= p.maxTime) {
       // Collapse — if player was on or near it, he falls and takes damage
-      const hitRange = golem.phase === 2 ? 45 : 30;
+      const hitRange = golem.phase === 2 ? 55 : 40;
       if (Math.abs(player.x - p.x) < hitRange) {
         // Player falls from the height
         player.vy = 0;
@@ -1659,10 +1875,19 @@ function updateGolemHazards(dt) {
     const c = golem.poisonClouds[i]; c.life -= dt;
     if (c.life <= 0) { golem.poisonClouds.splice(i, 1); continue; }
     // Damage player inside cloud (stronger in Phase 2)
-    const poisonDps = golem.phase === 2 ? 6 : 3; // 6 HP/sec in P2
+    const poisonDps = golem.phase === 2 ? 10 : 5; // 5 HP/sec P1, 10 HP/sec P2
     if (Math.abs(player.x - c.x) < 35 && player.y >= FLOOR_Y - 50) {
       player.hp -= poisonDps * dt;
-      if (player.hp <= 0 && player.state !== 'death') { player.hp = 0; player.state = 'death'; player.stateTimer = 0; sfxDeath(); }
+      if (player.hp <= 0 && player.state !== 'death') {
+        player.hp = 0;
+        if (lastBreathAvailable) {
+          lastBreathAvailable = false; lastBreathActive = true; lastBreathTimer = 0;
+          stats.usedLastBreath = true;
+          player.state = 'death'; player.stateTimer = 0; sfxDeath();
+        } else {
+          player.state = 'death'; player.stateTimer = 0; deathTimer = 2.0; sfxDeath();
+        }
+      }
     }
   }
   // Roots
@@ -1704,18 +1929,18 @@ function checkGolemHit() {
     const baseDmg = player.comboStep === 3 ? 14 : 8;
     const dmg = Math.round(baseDmg * equippedAmulet.dmgMod);
     golem.hp -= dmg;
+    if (golem.hp < 0) golem.hp = 0;
     stats.damageDealt += dmg; stats.hits++;
     player._hitConnected = true;
     spawnParticles(golem.x, golem.y - 45, 5, '#8A8070', 100);
     screenShake(2, 0.05); sfxHit();
     // NO hitStop on golem — he must be able to react
 
-    // Track consecutive hits — after 2, FORCE push back immediately
-    golem._hitsReceived++;
-    golem._hitResetTimer = 0.8;
-    if (golem._hitsReceived >= 2 && golem.state !== 'phase_transition' && golem.state !== 'dead') {
+    // Anti stun-lock: after 3 consecutive hits, golem pushes back
+    golem._hitsReceived = (golem._hitsReceived || 0) + 1;
+    golem._hitResetTimer = 1.2;
+    if (golem._hitsReceived >= 3 && golem.state !== 'phase_transition' && golem.state !== 'dead') {
       golem._hitsReceived = 0;
-      // Immediately interrupt and push — no telegraph
       golem.state = 'attack'; golem.stateTimer = 0;
       golem.castType = 'push';
       golemPushBack();
@@ -1741,6 +1966,7 @@ function checkSpiritHit() {
     const baseDmg = player.comboStep === 3 ? 14 : 8;
     const dmg = Math.round(baseDmg * equippedAmulet.dmgMod);
     spirit.hp -= dmg;
+    if (spirit.hp < 0) spirit.hp = 0;
     stats.damageDealt += dmg; stats.hits++;
     player._hitConnected = true;
     spawnParticles(spirit.x, spirit.y - 40, 6, '#66EEFF', 120);
@@ -1871,8 +2097,10 @@ function render() {
   ctx.restore();
 
   // Overlays
+  if (gameState === 'title') drawTitleScreen();
   if (gameState === 'menu') drawMenu();
   if (gameState === 'cinematic') drawCinematic();
+  if (gameState === 'final_cinematic') drawFinalCinematic();
   if (gameState === 'equip' || gameState === 'midequip') drawEquipMenu();
   if (gameState === 'intro') drawIntro();
   if (gameState === 'death') drawDeathScreen();
@@ -2050,12 +2278,12 @@ function drawGolem() {
   // Platforms (rising stones) — wider in Phase 2
   golem.platforms.forEach(p => {
     const rise = Math.min(p.timer / p.maxTime, 1) * 60;
-    const pw = golem.phase === 2 ? 55 : 40;
+    const pw = golem.phase === 2 ? 70 : 55;
     ctx.fillStyle = '#8A8070'; ctx.fillRect(p.x - pw/2, FLOOR_Y - rise - 10, pw, 12);
     ctx.fillStyle = '#6A6050'; ctx.fillRect(p.x - pw/2 + 3, FLOOR_Y - rise - 8, pw - 6, 3);
     // Warning circle
     ctx.strokeStyle = `rgba(255,100,50,${0.5 + Math.sin(p.timer*10)*0.3})`; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.ellipse(p.x, FLOOR_Y-2, pw/2 + 5, 6, 0, 0, Math.PI*2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(p.x, FLOOR_Y-2, pw/2 + 8, 7, 0, 0, Math.PI*2); ctx.stroke();
   });
   // Roots
   golem.roots.forEach(r => {
@@ -2077,15 +2305,19 @@ function drawGolem() {
   const f = golem.facing;
 
   // Legs
-  ctx.fillStyle = '#7A7060'; ctx.fillRect(-18, -22, 14, 24); ctx.fillRect(4, -22, 14, 24);
-  // Body (large stone mass)
-  ctx.fillStyle = '#8A8070'; ctx.fillRect(-25, -75, 50, 58);
+  ctx.fillStyle = '#7A7060'; ctx.fillRect(-22, -24, 16, 28); ctx.fillRect(6, -24, 16, 28);
+  // Body (large round stone mass — gordito)
+  ctx.fillStyle = '#8A8070';
+  ctx.beginPath(); ctx.ellipse(0, -60, 32, 40, 0, 0, Math.PI*2); ctx.fill();
+  // Belly highlight (rounder)
+  ctx.fillStyle = '#9A9080';
+  ctx.beginPath(); ctx.ellipse(0, -50, 22, 25, 0, 0, Math.PI*2); ctx.fill();
   // Moss patches
-  ctx.fillStyle = '#5A8A4A'; ctx.fillRect(-20, -50, 8, 6); ctx.fillRect(12, -65, 7, 5);
-  ctx.fillRect(-15, -35, 10, 4);
+  ctx.fillStyle = '#5A8A4A'; ctx.fillRect(-24, -55, 10, 7); ctx.fillRect(14, -72, 9, 6);
+  ctx.fillRect(-18, -38, 12, 5);
   // Flowers on body
-  ctx.fillStyle = '#FFAA66'; ctx.beginPath(); ctx.arc(-18, -68, 3, 0, Math.PI*2); ctx.fill();
-  ctx.fillStyle = '#FF88AA'; ctx.beginPath(); ctx.arc(16, -42, 2.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#FFAA66'; ctx.beginPath(); ctx.arc(-22, -75, 3.5, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#FF88AA'; ctx.beginPath(); ctx.arc(20, -48, 3, 0, Math.PI*2); ctx.fill();
   // Phase 2: Many more flowers bloom on body
   if (golem.phase === 2) {
     ctx.fillStyle = '#FF88AA'; ctx.beginPath(); ctx.arc(-10, -55, 3, 0, Math.PI*2); ctx.fill();
@@ -2105,25 +2337,25 @@ function drawGolem() {
   }
 
   // Arms
-  ctx.save(); ctx.translate(f * 22, -55); ctx.rotate(golem.armAngle * f);
-  ctx.fillStyle = '#7A7060'; ctx.fillRect(-6, 0, 12, 30);
+  ctx.save(); ctx.translate(f * 28, -60); ctx.rotate(golem.armAngle * f);
+  ctx.fillStyle = '#7A7060'; ctx.fillRect(-7, 0, 14, 34);
   // Fist
-  ctx.fillStyle = '#6A6050'; ctx.beginPath(); ctx.arc(0, 32, 10, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#6A6050'; ctx.beginPath(); ctx.arc(0, 36, 12, 0, Math.PI*2); ctx.fill();
   ctx.restore();
   // Back arm
-  ctx.fillStyle = '#6A6050'; ctx.fillRect(-f * 20, -55, 10, 25);
+  ctx.fillStyle = '#6A6050'; ctx.fillRect(-f * 24, -60, 12, 28);
 
   // Head
-  ctx.fillStyle = '#8A8070'; ctx.beginPath(); ctx.arc(0, -82, 16, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#8A8070'; ctx.beginPath(); ctx.arc(0, -95, 18, 0, Math.PI*2); ctx.fill();
   // Eyes (green glow)
   ctx.fillStyle = '#66DD66';
-  ctx.fillRect(-7, -85, 5, 4); ctx.fillRect(2, -85, 5, 4);
+  ctx.fillRect(-8, -98, 6, 5); ctx.fillRect(2, -98, 6, 5);
   ctx.shadowColor = '#66DD66'; ctx.shadowBlur = 6;
-  ctx.fillRect(-7, -85, 5, 4); ctx.fillRect(2, -85, 5, 4);
+  ctx.fillRect(-8, -98, 6, 5); ctx.fillRect(2, -98, 6, 5);
   ctx.shadowBlur = 0;
   // Small vine on head
-  ctx.fillStyle = '#4A8A3A'; ctx.fillRect(-2, -96, 3, 12);
-  ctx.fillStyle = '#66DD66'; ctx.beginPath(); ctx.ellipse(0, -98, 4, 3, 0, 0, Math.PI*2); ctx.fill();
+  ctx.fillStyle = '#4A8A3A'; ctx.fillRect(-2, -112, 3, 14);
+  ctx.fillStyle = '#66DD66'; ctx.beginPath(); ctx.ellipse(0, -114, 5, 3.5, 0, 0, Math.PI*2); ctx.fill();
 
   ctx.restore();
 }
@@ -2241,7 +2473,7 @@ function drawSpirit() {
 function drawHUD() {
   // Player HP
   ctx.fillStyle=COLORS.healthBg; ctx.fillRect(20,20,204,22);
-  ctx.fillStyle=COLORS.healthRed; ctx.fillRect(22,22,(player.hp/player.maxHp)*200,18);
+  ctx.fillStyle=COLORS.healthRed; ctx.fillRect(22,22,Math.max(0,(player.hp/player.maxHp))*200,18);
   ctx.strokeStyle=COLORS.white; ctx.lineWidth=1; ctx.strokeRect(20,20,204,22);
   ctx.fillStyle=COLORS.white; ctx.font='10px monospace'; ctx.fillText('BOB',22,16);
 
@@ -2281,7 +2513,7 @@ function drawHUD() {
                      (currentEnemy==='spirit'?(ePhase2?'#3388CC':'#66EEFF'):(ePhase2?'#CC2200':COLORS.healthRed))));
 
     ctx.fillStyle=COLORS.healthBg; ctx.fillRect(bx,52,bw+4,16);
-    ctx.fillStyle=barColor; ctx.fillRect(bx+2,54,(eHp/eMaxHp)*bw,12);
+    ctx.fillStyle=barColor; ctx.fillRect(bx+2,54,Math.max(0,(eHp/eMaxHp))*bw,12);
     ctx.strokeStyle=COLORS.white; ctx.lineWidth=1; ctx.strokeRect(bx,52,bw+4,16);
     ctx.fillStyle=COLORS.white; ctx.font='10px monospace'; ctx.textAlign='center';
     ctx.fillText(eName,canvas.width/2,48); ctx.textAlign='left';
@@ -2289,7 +2521,7 @@ function drawHUD() {
 
   // Controls
   ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='9px monospace';
-  ctx.fillText('A/D:Move | LClick:Attack | RClick:Jump | SPACE:Dodge | E/K:Tool',20,canvas.height-10);
+  ctx.fillText(T('controls'),20,canvas.height-10);
 }
 
 // --- EQUIPMENT MENU ---
@@ -2298,13 +2530,13 @@ function drawEquipMenu() {
 
   ctx.fillStyle=COLORS.white; ctx.font='bold 22px monospace'; ctx.textAlign='center';
   if (gameState === 'midequip') {
-    const defeatedName = currentEnemy === 'golem' ? 'GOLEM DEFEATED' : (currentEnemy === 'lady' ? 'LADY DEATH DEFEATED' : (currentEnemy === 'lion' ? 'WHITE LION DEFEATED' : 'SPIRIT DEFEATED'));
+    const defeatedName = currentEnemy === 'golem' ? 'GOLEM ' + T('bossDefeated') : (currentEnemy === 'lady' ? 'LADY DEATH ' + T('bossDefeated') : (currentEnemy === 'lion' ? 'WHITE LION ' + T('bossDefeated') : 'SPIRIT ' + T('bossDefeated')));
     const nextName = currentEnemy === 'golem' ? 'Lady Death' : (currentEnemy === 'lady' ? 'The White Lion' : (currentEnemy === 'lion' ? 'The Lost Spirit' : 'The Cat Keeper'));
-    ctx.fillText(defeatedName + ' — RE-EQUIP',canvas.width/2,40);
+    ctx.fillText(defeatedName,canvas.width/2,40);
     ctx.fillStyle='rgba(255,255,255,0.7)'; ctx.font='12px monospace';
-    ctx.fillText(`Prepare for ${nextName}. Your HP will be partially restored.`,canvas.width/2,60);
+    ctx.fillText(T('nextEnemy') + nextName,canvas.width/2,60);
   } else {
-    ctx.fillText('EQUIPMENT',canvas.width/2,50);
+    ctx.fillText(T('equipTitle'),canvas.width/2,50);
   }
   ctx.textAlign='left';
 
@@ -2313,7 +2545,7 @@ function drawEquipMenu() {
   ctx.fillStyle = equipSelection===0?COLORS.tunicRed:'#444'; ctx.fillRect(200,tabY,160,30);
   ctx.fillStyle = equipSelection===1?COLORS.tunicRed:'#444'; ctx.fillRect(380,tabY,160,30);
   ctx.fillStyle=COLORS.white; ctx.font='12px monospace'; ctx.textAlign='center';
-  ctx.fillText('AMULETS [1]',280,tabY+20); ctx.fillText('TOOLS [2]',460,tabY+20); ctx.textAlign='left';
+  ctx.fillText(T('amulets')+' [1]',280,tabY+20); ctx.fillText(T('tools')+' [2]',460,tabY+20); ctx.textAlign='left';
 
   // Items list
   const items = equipSelection===0 ? AMULETS : TOOLS;
@@ -2351,7 +2583,7 @@ function drawEquipMenu() {
 
   // Instructions
   ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='11px monospace'; ctx.textAlign='center';
-  ctx.fillText('↑↓ Navigate | ←→ Switch Tab | ENTER Equip | SPACE Start Fight',canvas.width/2,canvas.height-30);
+  ctx.fillText(T('changeTool'),canvas.width/2,canvas.height-30);
   ctx.textAlign='left';
 
   // Currently equipped summary
@@ -2359,24 +2591,140 @@ function drawEquipMenu() {
   ctx.fillText(`Equipped: ${equippedAmulet.name} + ${equippedTool.name}`,20,canvas.height-10);
 }
 
+// --- TITLE SCREEN ---
+function drawTitleScreen() {
+  const t = titleTimer;
+  // Darkening landscape gradient (starts light, gets darker over time)
+  const darkCycle = (Math.sin(t * 0.15) * 0.5 + 0.5); // Slowly oscillates
+  const skyDark = Math.floor(30 + darkCycle * 40);
+  const skyR = Math.floor(40 - darkCycle * 30);
+  const skyG = Math.floor(60 - darkCycle * 40);
+  const skyB = Math.floor(100 - darkCycle * 50);
+
+  // Sky gradient
+  const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  skyGrad.addColorStop(0, `rgb(${skyR},${skyG},${skyB})`);
+  skyGrad.addColorStop(0.6, `rgb(${Math.floor(skyR*0.5)},${Math.floor(skyG*0.4)},${Math.floor(skyB*0.6)})`);
+  skyGrad.addColorStop(1, '#0A0A12');
+  ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Stars (appear as sky darkens)
+  ctx.fillStyle = `rgba(255,255,255,${darkCycle * 0.6})`;
+  for (let i = 0; i < 20; i++) {
+    const sx = (Math.sin(i * 7.3 + t * 0.02) * 0.5 + 0.5) * canvas.width;
+    const sy = (Math.cos(i * 3.7) * 0.5 + 0.3) * canvas.height * 0.5;
+    ctx.beginPath(); ctx.arc(sx, sy, 0.8 + Math.sin(t + i) * 0.3, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Distant mountains/landscape silhouette
+  ctx.fillStyle = `rgb(${Math.floor(15 + darkCycle*10)},${Math.floor(18 + darkCycle*5)},${Math.floor(25 + darkCycle*8)})`;
+  ctx.beginPath(); ctx.moveTo(0, 340);
+  ctx.lineTo(80, 280); ctx.lineTo(180, 310); ctx.lineTo(280, 260);
+  ctx.lineTo(400, 290); ctx.lineTo(520, 240); ctx.lineTo(640, 270);
+  ctx.lineTo(750, 250); ctx.lineTo(850, 280); ctx.lineTo(960, 300);
+  ctx.lineTo(960, 540); ctx.lineTo(0, 540); ctx.closePath(); ctx.fill();
+
+  // Closer hills
+  ctx.fillStyle = `rgb(${Math.floor(10 + darkCycle*5)},${Math.floor(12 + darkCycle*3)},${Math.floor(18 + darkCycle*5)})`;
+  ctx.beginPath(); ctx.moveTo(0, 400);
+  ctx.lineTo(120, 370); ctx.lineTo(250, 390); ctx.lineTo(400, 360);
+  ctx.lineTo(550, 380); ctx.lineTo(700, 350); ctx.lineTo(850, 375);
+  ctx.lineTo(960, 360); ctx.lineTo(960, 540); ctx.lineTo(0, 540); ctx.closePath(); ctx.fill();
+
+  // Ground
+  ctx.fillStyle = '#0A0A10'; ctx.fillRect(0, 430, canvas.width, 110);
+
+  // Subtle path
+  ctx.fillStyle = 'rgba(30,25,20,0.6)';
+  ctx.beginPath(); ctx.moveTo(canvas.width/2 - 60, 540);
+  ctx.lineTo(canvas.width/2 - 20, 430); ctx.lineTo(canvas.width/2 + 20, 430);
+  ctx.lineTo(canvas.width/2 + 60, 540); ctx.closePath(); ctx.fill();
+
+  // Bob silhouette (from behind, looking at landscape)
+  const bx = canvas.width / 2, by = 430;
+  ctx.save(); ctx.translate(bx, by);
+  // Body silhouette
+  ctx.fillStyle = '#0D0D12';
+  // Legs
+  ctx.fillRect(-6, -5, 5, 12); ctx.fillRect(1, -5, 5, 12);
+  // Torso
+  ctx.fillRect(-8, -25, 16, 22);
+  // Cape hint
+  ctx.fillStyle = '#1A0A0A';
+  ctx.beginPath(); ctx.moveTo(-9, -20); ctx.lineTo(-12, -3); ctx.lineTo(12, -3); ctx.lineTo(9, -20); ctx.closePath(); ctx.fill();
+  // Head (helmet from behind)
+  ctx.fillStyle = '#0D0D12';
+  ctx.beginPath(); ctx.arc(0, -32, 9, 0, Math.PI*2); ctx.fill();
+  // Helmet ridge
+  ctx.fillStyle = '#151518';
+  ctx.fillRect(-1, -40, 2, 6);
+  // Branch weapon on back
+  ctx.save(); ctx.rotate(-0.2);
+  ctx.fillStyle = '#1A1510'; ctx.fillRect(6, -45, 2, 30);
+  ctx.fillStyle = '#0A1A0A'; ctx.beginPath(); ctx.ellipse(7, -47, 3, 2, 0, 0, Math.PI*2); ctx.fill();
+  ctx.restore();
+  ctx.restore();
+
+  // Miau text floating in the distance (faint, pulsing)
+  const miauAlpha = 0.3 + Math.sin(t * 1.2) * 0.2;
+  const miauY = 200 + Math.sin(t * 0.5) * 8;
+  ctx.fillStyle = `rgba(255,200,100,${miauAlpha})`;
+  ctx.font = 'italic 16px monospace'; ctx.textAlign = 'center';
+  ctx.fillText('...miau...', canvas.width / 2, miauY);
+
+  // Title
+  ctx.fillStyle = COLORS.white; ctx.font = 'bold 38px monospace'; ctx.textAlign = 'center';
+  ctx.fillText(T('title'), canvas.width/2, 70);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '13px monospace';
+  ctx.fillText(T('subtitle'), canvas.width/2, 95);
+
+  // Menu options
+  const pulse = Math.sin(t * 3) * 0.15 + 0.85;
+  ctx.fillStyle = `rgba(255,255,255,${pulse})`; ctx.font = 'bold 16px monospace';
+  ctx.fillText(T('newGame'), canvas.width/2, canvas.height - 80);
+
+  // Language toggle
+  ctx.fillStyle = 'rgba(200,180,255,0.7)'; ctx.font = '12px monospace';
+  ctx.fillText('[ L ] ' + T('language'), canvas.width/2, canvas.height - 50);
+
+  // Controls hint
+  ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '9px monospace';
+  ctx.fillText(T('controls'), canvas.width/2, canvas.height - 20);
+
+  ctx.textAlign = 'left';
+}
+
+// --- FULL RESET (new game from title) ---
+function fullResetGame() {
+  currentEnemy = 'golem';
+  enemyTransition = false;
+  lastBreathAvailable = true;
+  lastBreathActive = false;
+  golemStats = null; ladyStats = null; lionStats = null; spiritStats = null; keeperStats = null;
+  stats = { timePlayed:0, damageDealt:0, damageTaken:0, hits:0, dodges:0, toolUses:0, comboMax:0, usedLastBreath:false };
+  equippedAmulet = AMULETS[0]; equippedTool = TOOLS[0];
+  titleTimer = 0;
+}
+
 // --- MENU ---
 function drawMenu() {
   ctx.fillStyle='rgba(0,0,0,0.85)'; ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.fillStyle=COLORS.white; ctx.font='bold 36px monospace'; ctx.textAlign='center';
-  ctx.fillText('ASH & PURR',canvas.width/2,180);
-  ctx.font='14px monospace'; ctx.fillStyle=COLORS.tunicRed; ctx.fillText('A Soulslike Boss Fight',canvas.width/2,215);
-  ctx.fillStyle=COLORS.white; ctx.font='16px monospace'; ctx.fillText('[ Press ENTER to Start ]',canvas.width/2,320);
+  ctx.fillText(T('title'),canvas.width/2,180);
+  ctx.font='14px monospace'; ctx.fillStyle=COLORS.tunicRed; ctx.fillText(T('subtitle'),canvas.width/2,215);
+  ctx.fillStyle=COLORS.white; ctx.font='16px monospace'; ctx.fillText(T('pressEnter'),canvas.width/2,320);
   ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='11px monospace';
-  ctx.fillText('LClick:Attack | RClick:Jump | SPACE:Dodge | K:Tool | A/D:Move',canvas.width/2,420);
+  ctx.fillText(T('controls'),canvas.width/2,420);
   ctx.textAlign='left';
 }
 
 // --- CINEMATIC ---
 function drawCinematic() {
   ctx.fillStyle='#000'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  const lines = T('cinematic');
   const startLine = Math.max(0, cinematicIndex - 4);
-  for (let i = startLine; i <= cinematicIndex && i < CINEMATIC_LINES.length; i++) {
-    const line = CINEMATIC_LINES[i];
+  for (let i = startLine; i <= cinematicIndex && i < lines.length; i++) {
+    const line = lines[i];
     if (!line.text) continue;
     const isCurrent = (i === cinematicIndex);
     const age = isCurrent ? cinematicAlpha : 1;
@@ -2389,7 +2737,92 @@ function drawCinematic() {
   }
   ctx.globalAlpha = 1;
   ctx.fillStyle='rgba(255,255,255,0.3)'; ctx.font='10px monospace'; ctx.textAlign='center';
-  ctx.fillText('Press ENTER or SPACE to skip', canvas.width/2, canvas.height - 30);
+  ctx.fillText(T('skipKey'), canvas.width/2, canvas.height - 30);
+  ctx.textAlign='left';
+}
+
+// --- FINAL CINEMATIC (The Unknown One) ---
+function drawFinalCinematic() {
+  // Dark atmosphere with shifting purple/shadow tones
+  ctx.fillStyle='#0A0008'; ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // Animated dark particles/shadows in background
+  const t = finalCinematicTimer + finalCinematicIndex * 2;
+  for (let i = 0; i < 12; i++) {
+    const sx = (Math.sin(t * 0.3 + i * 1.1) * 0.5 + 0.5) * canvas.width;
+    const sy = (Math.cos(t * 0.2 + i * 0.8) * 0.5 + 0.5) * canvas.height;
+    const sr = 30 + Math.sin(t * 0.5 + i) * 15;
+    ctx.fillStyle = `rgba(60,0,80,${0.08 + Math.sin(t + i) * 0.04})`;
+    ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI*2); ctx.fill();
+  }
+
+  // Draw The Unknown One silhouette (shadowy figure, center)
+  const ux = canvas.width / 2, uy = 200;
+  const shadowPulse = Math.sin(t * 1.5) * 3;
+
+  // Shadow aura
+  const auraGrad = ctx.createRadialGradient(ux, uy, 10, ux, uy, 70 + shadowPulse);
+  auraGrad.addColorStop(0, 'rgba(80,0,120,0.3)');
+  auraGrad.addColorStop(0.6, 'rgba(40,0,60,0.1)');
+  auraGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = auraGrad;
+  ctx.beginPath(); ctx.arc(ux, uy, 70 + shadowPulse, 0, Math.PI*2); ctx.fill();
+
+  // Body — shifting shadow mass
+  ctx.fillStyle = '#1A0020';
+  ctx.beginPath(); ctx.ellipse(ux, uy + 10, 22 + shadowPulse * 0.5, 35, 0, 0, Math.PI*2); ctx.fill();
+  // Cape/tendrils
+  ctx.fillStyle = '#0D0012';
+  ctx.beginPath();
+  ctx.moveTo(ux - 20, uy + 20);
+  ctx.quadraticCurveTo(ux - 35 + Math.sin(t) * 5, uy + 60, ux - 15, uy + 70);
+  ctx.lineTo(ux + 15, uy + 70);
+  ctx.quadraticCurveTo(ux + 35 + Math.cos(t) * 5, uy + 60, ux + 20, uy + 20);
+  ctx.fill();
+  // Head
+  ctx.fillStyle = '#1A0020';
+  ctx.beginPath(); ctx.arc(ux, uy - 25, 14, 0, Math.PI*2); ctx.fill();
+  // Eyes — sinister glowing
+  ctx.fillStyle = '#CC00FF';
+  ctx.shadowColor = '#CC00FF'; ctx.shadowBlur = 8;
+  ctx.beginPath(); ctx.arc(ux - 5, uy - 27, 2.5, 0, Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(ux + 5, uy - 27, 2.5, 0, Math.PI*2); ctx.fill();
+  ctx.shadowBlur = 0;
+
+  // Crown silhouette (stolen king's crown)
+  ctx.fillStyle = '#2A0038';
+  ctx.beginPath();
+  ctx.moveTo(ux - 12, uy - 37); ctx.lineTo(ux - 10, uy - 45);
+  ctx.lineTo(ux - 5, uy - 39); ctx.lineTo(ux, uy - 48);
+  ctx.lineTo(ux + 5, uy - 39); ctx.lineTo(ux + 10, uy - 45);
+  ctx.lineTo(ux + 12, uy - 37); ctx.closePath(); ctx.fill();
+
+  // Dialogue lines
+  const fcLinesRender = T('finalCinematic');
+  const startLine = Math.max(0, finalCinematicIndex - 3);
+  for (let i = startLine; i <= finalCinematicIndex && i < fcLinesRender.length; i++) {
+    const line = fcLinesRender[i];
+    if (!line.text) continue;
+    const isCurrent = (i === finalCinematicIndex);
+    const age = isCurrent ? finalCinematicAlpha : 1;
+    const fadeOut = Math.max(0, 1 - (finalCinematicIndex - i) * 0.3);
+    ctx.globalAlpha = age * fadeOut;
+
+    // Speaker name
+    if (line.speaker) {
+      ctx.fillStyle = '#AA44FF'; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'center';
+      ctx.fillText(line.speaker, canvas.width/2, 310 + (i - startLine) * 45);
+    }
+    // Text
+    ctx.fillStyle = '#E8D0FF';
+    ctx.font = isCurrent ? '13px monospace' : '11px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(line.text, canvas.width/2, 325 + (i - startLine) * 45);
+  }
+  ctx.globalAlpha = 1;
+
+  ctx.fillStyle='rgba(200,150,255,0.3)'; ctx.font='10px monospace'; ctx.textAlign='center';
+  ctx.fillText(T('skipKey'), canvas.width/2, canvas.height - 20);
   ctx.textAlign='left';
 }
 
@@ -2421,7 +2854,9 @@ function drawDeathScreen() {
     ctx.restore();
 
     ctx.fillStyle=COLORS.healthRed; ctx.font='bold 22px monospace'; ctx.textAlign='center';
-    ctx.fillText('Stand once more.',canvas.width/2, 60);
+    ctx.fillText(T('youLose'),canvas.width/2, 40);
+    ctx.fillStyle=COLORS.white; ctx.font='bold 40px monospace';
+    ctx.fillText(T('gitGud'),canvas.width/2, 90);
 
     // Stats box
     const sx = canvas.width/2 - 180, sy = 270;
@@ -2429,32 +2864,32 @@ function drawDeathScreen() {
     ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1; ctx.strokeRect(sx, sy, 360, 200);
 
     ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='bold 12px monospace'; ctx.textAlign='center';
-    ctx.fillText('— BATTLE STATISTICS —', canvas.width/2, sy + 22);
+    ctx.fillText(T('battleStats'), canvas.width/2, sy + 22);
 
     ctx.font='11px monospace'; ctx.textAlign='left';
     const minutes = Math.floor(stats.timePlayed / 60);
     const seconds = Math.floor(stats.timePlayed % 60);
     const statLines = [
-      ['Time', `${minutes}m ${seconds}s`],
-      ['Damage Dealt', `${stats.damageDealt}`],
-      ['Damage Taken', `${stats.damageTaken}`],
-      ['Hits Landed', `${stats.hits}`],
-      ['Dodges', `${stats.dodges}`],
-      ['Tool Uses', `${stats.toolUses}`],
-      ['Max Combo', `${stats.comboMax} hits`],
-      ['Last Breath', stats.usedLastBreath ? 'YES' : 'No'],
+      [T('time'), `${minutes}m ${seconds}s`],
+      [T('damageDealt'), `${stats.damageDealt}`],
+      [T('damageTaken'), `${stats.damageTaken}`],
+      [T('hitsLanded'), `${stats.hits}`],
+      [T('dodges'), `${stats.dodges}`],
+      [T('toolUses'), `${stats.toolUses}`],
+      [T('maxCombo'), `${stats.comboMax} ${T('hits')}`],
+      [T('lastBreath'), stats.usedLastBreath ? T('yes') : T('no')],
     ];
     statLines.forEach((line, i) => {
       const ly = sy + 44 + i * 18;
       ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.textAlign = 'left';
       ctx.fillText(line[0], sx + 20, ly);
-      ctx.fillStyle = line[0] === 'Last Breath' && stats.usedLastBreath ? '#FFDDAA' : COLORS.white;
+      ctx.fillStyle = line[0] === T('lastBreath') && stats.usedLastBreath ? '#FFDDAA' : COLORS.white;
       ctx.textAlign = 'right';
       ctx.fillText(line[1], sx + 340, ly);
     });
 
     ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='13px monospace'; ctx.textAlign='center';
-    ctx.fillText('[ R ] Retry    [ M ] Main Menu',canvas.width/2, canvas.height - 30);
+    ctx.fillText(T('retry') + '    ' + T('mainMenu'),canvas.width/2, canvas.height - 30);
     ctx.textAlign='left';
   }
 }
@@ -2466,69 +2901,105 @@ function drawVictoryScreen() {
 
   if(alpha >= 0.5){
     // Title
-    ctx.fillStyle=COLORS.buckle; ctx.font='bold 20px monospace'; ctx.textAlign='center';
-    ctx.fillText('VICTORY — ALL ENEMIES DEFEATED',canvas.width/2, 35);
-    ctx.fillStyle=COLORS.white; ctx.font='12px monospace';
-    ctx.fillText('The cats are free once more.',canvas.width/2, 55);
+    ctx.fillStyle=COLORS.buckle; ctx.font='bold 18px monospace'; ctx.textAlign='center';
+    ctx.fillText(T('victory'),canvas.width/2, 25);
+    ctx.fillStyle=COLORS.white; ctx.font='11px monospace';
+    ctx.fillText(T('victorySubtitle'),canvas.width/2, 42);
 
-    // Bob celebration
-    const bobVX = canvas.width/2;
-    const bobVY = 120 + Math.sin(victoryAnimTimer * 3) * 4;
-    ctx.save(); ctx.translate(bobVX, bobVY);
-    ctx.fillStyle=COLORS.tunicRed; ctx.fillRect(-10,-30,20,22);
-    ctx.fillStyle=COLORS.armorLight; ctx.fillRect(-8,-38,16,10);
-    ctx.fillStyle=COLORS.armorLight; ctx.beginPath(); ctx.arc(0,-44,10,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle=COLORS.visor; ctx.fillRect(-7,-45,14,4);
-    ctx.save(); ctx.translate(9,-28); ctx.rotate(-0.3);
-    ctx.fillStyle=COLORS.branch; ctx.fillRect(-1,-24,3,26);
-    ctx.fillStyle=COLORS.leaf; ctx.beginPath(); ctx.ellipse(0,-26,3,2,0,0,Math.PI*2); ctx.fill();
-    ctx.restore(); ctx.restore();
-    if (Math.random()<0.1) spawnParticles(bobVX+(Math.random()-0.5)*40,bobVY-40,1,COLORS.buckle,30);
+    // Boss tombstones row — small defeated portraits
+    const bosses = [
+      { name:'Golem', color:'#66DD66', bodyColor:'#8A8070', st: golemStats },
+      { name:'Lady Death', color:'#882233', bodyColor:'#2A2A2A', st: ladyStats },
+      { name:'White Lion', color:'#D4A030', bodyColor:'#F5F0E8', st: lionStats },
+      { name:'Lost Spirit', color:'#66EEFF', bodyColor:'#2A3A5C', st: spiritStats },
+      { name:'Cat Keeper', color:COLORS.bossGlowOrange, bodyColor:COLORS.bossRock, st: keeperStats },
+    ];
 
-    // Enemies defeated list
-    ctx.fillStyle='#66DD66'; ctx.font='bold 11px monospace'; ctx.textAlign='left';
-    ctx.fillText('✓ The Garden Golem', 80, 170);
-    ctx.fillStyle='#882233';
-    ctx.fillText('✓ Lady Death', 80, 186);
-    ctx.fillStyle='#D4A030';
-    ctx.fillText('✓ The White Lion', 80, 202);
-    ctx.fillStyle='#66EEFF';
-    ctx.fillText('✓ The Lost Spirit', 80, 218);
-    ctx.fillStyle=COLORS.bossGlowOrange;
-    ctx.fillText('✓ The Cat Keeper', 80, 234);
+    const startX = 48;
+    const spacing = (canvas.width - 96) / 5;
 
-    ctx.fillStyle = (golemStats && golemStats.usedLastBreath) || (spiritStats && spiritStats.usedLastBreath) || (keeperStats && keeperStats.usedLastBreath) ? '#FFDDAA' : 'rgba(255,255,255,0.5)';
-    ctx.font='10px monospace';
-    ctx.fillText('Last Breath: ' + ((golemStats && golemStats.usedLastBreath) || (spiritStats && spiritStats.usedLastBreath) || (keeperStats && keeperStats.usedLastBreath) ? 'YES' : 'No'), 80, 226);
+    bosses.forEach((b, i) => {
+      const bx = startX + i * spacing + spacing/2;
+      const by = 90;
 
-    // Three stat columns
-    const drawStatCol = (title, color, st, sx, sy) => {
+      // Dead portrait circle
+      ctx.fillStyle = 'rgba(255,255,255,0.05)';
+      ctx.beginPath(); ctx.arc(bx, by, 22, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = b.color; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(bx, by, 22, 0, Math.PI*2); ctx.stroke();
+
+      // Mini dead body (fallen on side)
+      ctx.save(); ctx.translate(bx, by); ctx.rotate(0.5);
+      ctx.fillStyle = b.bodyColor;
+      ctx.beginPath(); ctx.ellipse(0, 0, 10, 7, 0, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle = b.color; ctx.globalAlpha = 0.4;
+      ctx.fillRect(-5, -2, 10, 4); // X mark
+      ctx.globalAlpha = 1;
+      ctx.restore();
+
+      // ✓ and name
+      ctx.fillStyle = b.color; ctx.font = '9px monospace'; ctx.textAlign = 'center';
+      ctx.fillText('✓', bx, by + 30);
+      ctx.fillStyle = COLORS.white; ctx.font = '8px monospace';
+      ctx.fillText(b.name, bx, by + 40);
+    });
+
+    // Last Breath indicator
+    const usedLB = (golemStats&&golemStats.usedLastBreath)||(ladyStats&&ladyStats.usedLastBreath)||(lionStats&&lionStats.usedLastBreath)||(spiritStats&&spiritStats.usedLastBreath)||(keeperStats&&keeperStats.usedLastBreath);
+    ctx.fillStyle = usedLB ? '#FFDDAA' : 'rgba(255,255,255,0.4)';
+    ctx.font = '9px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(T('lastBreath') + ': ' + (usedLB ? T('yes') : T('no')), canvas.width/2, 145);
+
+    // Stats grid — 5 columns, compact
+    const drawMiniStat = (title, color, st, sx, sy) => {
       if (!st) return;
-      ctx.fillStyle=color; ctx.font='bold 11px monospace'; ctx.textAlign='center';
-      ctx.fillText(title, sx + 155, sy);
-      ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fillRect(sx, sy+5, 310, 150);
-      ctx.strokeStyle='rgba(255,255,255,0.15)'; ctx.lineWidth=1; ctx.strokeRect(sx, sy+5, 310, 150);
-
+      // Header
+      ctx.fillStyle = color; ctx.font = 'bold 9px monospace'; ctx.textAlign = 'center';
+      ctx.fillText(title, sx + 80, sy);
+      // Box
+      ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fillRect(sx, sy+4, 160, 118);
+      ctx.strokeStyle = `${color}44`; ctx.lineWidth = 1; ctx.strokeRect(sx, sy+4, 160, 118);
+      // Stats
       const m = Math.floor(st.timePlayed/60), s = Math.floor(st.timePlayed%60);
       const lines = [
-        ['Time',`${m}m ${s}s`],['DMG Dealt',`${st.damageDealt}`],['DMG Taken',`${st.damageTaken}`],
-        ['Hits',`${st.hits}`],['Dodges',`${st.dodges}`],['Tool Uses',`${st.toolUses}`],
-        ['Max Combo',`${st.comboMax}`],
+        [`${m}m ${s}s`], [`DMG: ${st.damageDealt}`], [`Taken: ${st.damageTaken}`],
+        [`Hits: ${st.hits}`], [`Dodges: ${st.dodges}`], [`Tools: ${st.toolUses}`],
+        [`Combo: ${st.comboMax}`],
       ];
-      ctx.font='10px monospace';
-      lines.forEach((l,i)=>{
-        const ly=sy+22+i*18;
-        ctx.fillStyle='rgba(255,255,255,0.5)';ctx.textAlign='left';ctx.fillText(l[0],sx+10,ly);
-        ctx.fillStyle=COLORS.white;ctx.textAlign='right';ctx.fillText(l[1],sx+300,ly);
+      ctx.font = '8px monospace'; ctx.textAlign = 'center';
+      lines.forEach((l, i) => {
+        ctx.fillStyle = i === 0 ? COLORS.white : 'rgba(255,255,255,0.6)';
+        ctx.fillText(l[0], sx + 80, sy + 20 + i * 15);
       });
     };
 
-    drawStatCol('GARDEN GOLEM', '#66DD66', golemStats, 10, 245);
-    drawStatCol('LOST SPIRIT', '#66EEFF', spiritStats, 330, 245);
-    drawStatCol('CAT KEEPER', COLORS.bossGlowOrange, keeperStats, 650, 245);
+    // Two rows of stats
+    const row1Y = 160;
+    const row2Y = 295;
+    const colW = 175;
+    const margin = (canvas.width - colW * 5) / 2;
 
-    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='11px monospace'; ctx.textAlign='center';
-    ctx.fillText('[ ENTER ] Continue', canvas.width/2, canvas.height - 20);
+    drawMiniStat('GOLEM', '#66DD66', golemStats, margin, row1Y);
+    drawMiniStat('LADY DEATH', '#882233', ladyStats, margin + colW, row1Y);
+    drawMiniStat('WHITE LION', '#D4A030', lionStats, margin + colW*2, row1Y);
+    drawMiniStat('SPIRIT', '#66EEFF', spiritStats, margin + colW*3, row1Y);
+    drawMiniStat('CAT KEEPER', COLORS.bossGlowOrange, keeperStats, margin + colW*4, row1Y);
+
+    // Bob celebration (small, bottom)
+    const bobVX = canvas.width/2, bobVY = canvas.height - 80;
+    ctx.save(); ctx.translate(bobVX, bobVY + Math.sin(victoryAnimTimer*3)*3);
+    ctx.fillStyle=COLORS.tunicRed; ctx.fillRect(-8,-25,16,18);
+    ctx.fillStyle=COLORS.armorLight; ctx.fillRect(-6,-32,12,8);
+    ctx.fillStyle=COLORS.armorLight; ctx.beginPath(); ctx.arc(0,-37,8,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=COLORS.visor; ctx.fillRect(-5,-38,10,3);
+    ctx.save(); ctx.translate(7,-24); ctx.rotate(-0.3);
+    ctx.fillStyle=COLORS.branch; ctx.fillRect(-1,-18,2,20);
+    ctx.fillStyle=COLORS.leaf; ctx.beginPath(); ctx.ellipse(0,-20,2.5,1.5,0,0,Math.PI*2); ctx.fill();
+    ctx.restore(); ctx.restore();
+    if (Math.random()<0.08) spawnParticles(bobVX+(Math.random()-0.5)*30,bobVY-30,1,COLORS.buckle,25);
+
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font='10px monospace'; ctx.textAlign='center';
+    ctx.fillText(T('continueKey'), canvas.width/2, canvas.height - 15);
     ctx.textAlign='left';
   }
 }
@@ -2547,14 +3018,29 @@ function gameLoop(timestamp) {
   mouseJust.left = false; mouseJust.right = false;
 
   switch (gameState) {
+    case 'title':
+      titleTimer += dt;
+      // Language toggle with L key
+      if (justPressed('KeyL')) {
+        currentLang = currentLang === 'en' ? 'es' : 'en';
+      }
+      // New Game with Enter
+      if (justPressed('Enter')) {
+        initAudio();
+        fullResetGame();
+        gameState = 'cinematic'; cinematicIndex = 0; cinematicTimer = 0; cinematicAlpha = 0;
+      }
+      break;
+
     case 'menu':
       if (justPressed('Enter')) { initAudio(); gameState = 'cinematic'; cinematicIndex = 0; cinematicTimer = 0; cinematicAlpha = 0; }
       break;
 
     case 'cinematic':
       cinematicTimer += dt;
-      if (cinematicIndex < CINEMATIC_LINES.length) {
-        const line = CINEMATIC_LINES[cinematicIndex];
+      const cLines = T('cinematic');
+      if (cinematicIndex < cLines.length) {
+        const line = cLines[cinematicIndex];
         if (cinematicTimer >= line.delay) {
           cinematicTimer = 0;
           cinematicIndex++;
@@ -2566,7 +3052,7 @@ function gameLoop(timestamp) {
         gameState = 'equip'; equipCursor = 0; equipSelection = 0;
       }
       // Auto-advance after all lines
-      if (cinematicIndex >= CINEMATIC_LINES.length && cinematicTimer >= 2.0) {
+      if (cinematicIndex >= cLines.length && cinematicTimer >= 2.0) {
         gameState = 'equip'; equipCursor = 0; equipSelection = 0;
       }
       break;
@@ -2585,11 +3071,11 @@ function gameLoop(timestamp) {
       }
       if (justPressed('Space')) {
         // Set up intro for current enemy
-        if (currentEnemy === 'golem') { introLines = GOLEM_INTRO; introSpeaker = 'The Garden Golem'; }
-        else if (currentEnemy === 'lady') { introLines = LADY_INTRO; introSpeaker = 'Lady Death'; }
-        else if (currentEnemy === 'lion') { introLines = LION_INTRO; introSpeaker = 'The White Lion'; }
-        else if (currentEnemy === 'spirit') { introLines = SPIRIT_INTRO; introSpeaker = 'The Lost Spirit'; }
-        else { introLines = KEEPER_INTRO; introSpeaker = 'The Cat Keeper'; }
+        if (currentEnemy === 'golem') { introLines = T('golemIntro'); introSpeaker = 'The Garden Golem'; }
+        else if (currentEnemy === 'lady') { introLines = T('ladyIntro'); introSpeaker = 'Lady Death'; }
+        else if (currentEnemy === 'lion') { introLines = T('lionIntro'); introSpeaker = 'The White Lion'; }
+        else if (currentEnemy === 'spirit') { introLines = T('spiritIntro'); introSpeaker = 'The Lost Spirit'; }
+        else { introLines = T('keeperIntro'); introSpeaker = 'The Cat Keeper'; }
         gameState = 'intro'; introIndex = 0; introCharIndex = 0;
         player.maxHp = Math.round(player.baseMaxHp * equippedAmulet.hpMod);
         player.hp = player.maxHp;
@@ -2668,53 +3154,52 @@ function gameLoop(timestamp) {
         // Immobilize player during boss death
         player.vx = 0;
         player.state = 'idle';
-        if (boss.stateTimer > 5) { keeperStats = { ...stats }; gameState = 'victory'; victoryAnimTimer = 0; sfxVictory(); stopPhase2Ambient(); stopMusic(); }
+        if (boss.stateTimer > 5) { keeperStats = { ...stats }; gameState = 'final_cinematic'; finalCinematicIndex = 0; finalCinematicTimer = 0; finalCinematicAlpha = 0; sfxVictory(); stopPhase2Ambient(); stopMusic(); }
       }
       // Golem death → defeat dialogue then mid-equip → lady
-      if (golem.state === 'dead' && currentEnemy === 'golem') {
+      if (golem.state === 'dead' && currentEnemy === 'golem' && gameState === 'playing') {
         player.vx = 0;
         if (golem.stateTimer > 3 && !enemyTransition) {
           enemyTransition = true;
           golemStats = { ...stats };
           stats = { damageDealt:0, damageTaken:0, dodges:0, jumps:0, hits:0, toolUses:0, comboMax:0, timePlayed:0, usedLastBreath: stats.usedLastBreath };
-          introLines = GOLEM_DEFEAT; introSpeaker = 'The Garden Golem';
+          introLines = T('golemDefeat'); introSpeaker = 'The Garden Golem';
           introIndex = 0; introCharIndex = 0; gameState = 'intro';
         }
       }
       // Lady death → defeat dialogue then mid-equip → lion
-      if (lady.state === 'dead' && currentEnemy === 'lady') {
+      if (lady.state === 'dead' && currentEnemy === 'lady' && gameState === 'playing') {
         player.vx = 0;
         if (lady.stateTimer > 3 && !enemyTransition) {
           enemyTransition = true;
           ladyStats = { ...stats };
           stats = { damageDealt:0, damageTaken:0, dodges:0, jumps:0, hits:0, toolUses:0, comboMax:0, timePlayed:0, usedLastBreath: stats.usedLastBreath };
-          introLines = LADY_DEFEAT; introSpeaker = 'Lady Death';
+          introLines = T('ladyDefeat'); introSpeaker = 'Lady Death';
           introIndex = 0; introCharIndex = 0; gameState = 'intro';
         }
       }
       // Lion death → defeat dialogue then mid-equip → spirit
-      if (lion.state === 'dead' && currentEnemy === 'lion') {
+      if (lion.state === 'dead' && currentEnemy === 'lion' && gameState === 'playing') {
         player.vx = 0;
         if (lion.stateTimer > 3 && !enemyTransition) {
           enemyTransition = true;
           lionStats = { ...stats };
           stats = { damageDealt:0, damageTaken:0, dodges:0, jumps:0, hits:0, toolUses:0, comboMax:0, timePlayed:0, usedLastBreath: stats.usedLastBreath };
-          introLines = LION_DEFEAT; introSpeaker = 'The White Lion';
+          introLines = T('lionDefeat'); introSpeaker = 'The White Lion';
           introIndex = 0; introCharIndex = 0; gameState = 'intro';
         }
       }
       // Spirit death → defeat dialogue then mid-equip → boss
-      if (spirit.state === 'dead' && currentEnemy === 'spirit') {
+      if (spirit.state === 'dead' && currentEnemy === 'spirit' && gameState === 'playing') {
         player.vx = 0;
         if (spirit.stateTimer > 3 && !enemyTransition) {
-          // Save spirit stats and show defeat dialogue + equip
           enemyTransition = true;
           transitionTimer = 0;
           spiritStats = { ...stats };
           // Reset stats for next fight
           stats = { damageDealt:0, damageTaken:0, dodges:0, jumps:0, hits:0, toolUses:0, comboMax:0, timePlayed:0, usedLastBreath: stats.usedLastBreath };
           // Set up defeat dialogue
-          introLines = SPIRIT_DEFEAT;
+          introLines = T('spiritDefeat');
           introSpeaker = 'The Lost Spirit';
           introIndex = 0; introCharIndex = 0;
           gameState = 'intro';
@@ -2726,8 +3211,15 @@ function gameLoop(timestamp) {
 
     case 'death':
       updateParticles(dt);
-      if (justPressed('KeyR')) { gameState = 'playing'; resetGame(); startMusic(); }
-      if (justPressed('KeyM')) { gameState = 'menu'; stopMusic(); stopPhase2Ambient(); }
+      if (justPressed('KeyR')) {
+        // Retry: go to equip screen for current boss
+        stopMusic(); stopPhase2Ambient();
+        resetGame();
+        lastBreathAvailable = true; lastBreathActive = false;
+        stats = { timePlayed:0, damageDealt:0, damageTaken:0, hits:0, dodges:0, toolUses:0, comboMax:0, usedLastBreath:false };
+        gameState = 'equip'; equipCursor = 0; equipSelection = 0;
+      }
+      if (justPressed('KeyM')) { gameState = 'title'; titleTimer = 0; stopMusic(); stopPhase2Ambient(); }
       break;
 
     case 'midequip':
@@ -2749,20 +3241,20 @@ function gameLoop(timestamp) {
           lady.x=700; lady.y=FLOOR_Y; lady.invulnerable=false; lady._phaseTransitioned=false;
           lady.daggers=[]; lady.comboCount=0; lady.castTimer=0;
           player.maxHp = Math.round(player.baseMaxHp * equippedAmulet.hpMod);
-          player.hp = Math.min(player.hp + Math.round(player.maxHp*0.3), player.maxHp);
+          player.hp = player.maxHp;
           player.x=200; player.state='idle'; player.stateTimer=0;
           toolCooldown=0; toolMaxCooldown=0;
-          introLines=LADY_INTRO; introSpeaker='Lady Death';
+          introLines=T('ladyIntro'); introSpeaker='Lady Death';
           introIndex=0; introCharIndex=0; gameState='intro';
         } else if (currentEnemy === 'lady') {
           // Transition to White Lion
           currentEnemy = 'lion'; enemyTransition = false;
           resetLion();
           player.maxHp = Math.round(player.baseMaxHp * equippedAmulet.hpMod);
-          player.hp = Math.min(player.hp + Math.round(player.maxHp*0.3), player.maxHp);
+          player.hp = player.maxHp;
           player.x=200; player.state='idle'; player.stateTimer=0;
           toolCooldown=0; toolMaxCooldown=0;
-          introLines=LION_INTRO; introSpeaker='The White Lion';
+          introLines=T('lionIntro'); introSpeaker='The White Lion';
           introIndex=0; introCharIndex=0; gameState='intro';
         } else if (currentEnemy === 'lion') {
           // Transition to Lost Spirit
@@ -2772,10 +3264,10 @@ function gameLoop(timestamp) {
           spirit.fireballs=[]; spirit.lightningTargets=[]; spirit.blackoutTimer=0;
           spirit.floatCooldown=10; spirit.isFloating=false; spirit._teleportDamaged=false;
           player.maxHp = Math.round(player.baseMaxHp * equippedAmulet.hpMod);
-          player.hp = Math.min(player.hp + Math.round(player.maxHp*0.3), player.maxHp);
+          player.hp = player.maxHp;
           player.x=200; player.state='idle'; player.stateTimer=0;
           toolCooldown=0; toolMaxCooldown=0;
-          introLines=SPIRIT_INTRO; introSpeaker='The Lost Spirit';
+          introLines=T('spiritIntro'); introSpeaker='The Lost Spirit';
           introIndex=0; introCharIndex=0; gameState='intro';
         } else {
           // Transition to Cat Keeper
@@ -2784,20 +3276,41 @@ function gameLoop(timestamp) {
           boss.x=700; boss.y=FLOOR_Y; boss.invulnerable=false; boss.glowIntensity=0;
           boss._seismicFired=false; boss._swiftHit=false;
           player.maxHp = Math.round(player.baseMaxHp * equippedAmulet.hpMod);
-          player.hp = Math.min(player.hp + Math.round(player.maxHp*0.3), player.maxHp);
+          player.hp = player.maxHp;
           player.x=200; player.state='idle'; player.stateTimer=0;
           toolCooldown=0; toolMaxCooldown=0;
-          introLines=KEEPER_INTRO; introSpeaker='The Cat Keeper';
+          introLines=T('keeperIntro'); introSpeaker='The Cat Keeper';
           introIndex=0; introCharIndex=0; gameState='intro';
         }
         spawnParticles(player.x, player.y-30, 10, COLORS.healGreen, 80);
       }
       break;
 
+    case 'final_cinematic':
+      finalCinematicTimer += dt;
+      const fcLines = T('finalCinematic');
+      if (finalCinematicIndex < fcLines.length) {
+        const fline = fcLines[finalCinematicIndex];
+        if (finalCinematicTimer >= fline.delay) {
+          finalCinematicTimer = 0;
+          finalCinematicIndex++;
+        }
+        finalCinematicAlpha = Math.min(finalCinematicTimer / 0.4, 1);
+      }
+      // Skip with Enter
+      if (justPressed('Enter') || justPressed('Space')) {
+        gameState = 'victory'; victoryAnimTimer = 0;
+      }
+      // Auto-advance after all lines
+      if (finalCinematicIndex >= fcLines.length && finalCinematicTimer >= 2.0) {
+        gameState = 'victory'; victoryAnimTimer = 0;
+      }
+      break;
+
     case 'victory':
       updateParticles(dt); victoryAnimTimer += dt;
       if (Math.random() < 0.1) spawnParticles(player.x + (Math.random()-0.5)*40, player.y - 60, 1, COLORS.buckle, 60);
-      if (justPressed('Enter') && victoryAnimTimer > 1.5) { gameState = 'menu'; stopPhase2Ambient(); stopMusic(); }
+      if (justPressed('Enter') && victoryAnimTimer > 1.5) { gameState = 'title'; titleTimer = 0; stopPhase2Ambient(); stopMusic(); }
       break;
   }
 
@@ -2866,3 +3379,19 @@ function resetGame() {
 if (!ctx.roundRect) { CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){this.moveTo(x+r,y);this.lineTo(x+w-r,y);this.quadraticCurveTo(x+w,y,x+w,y+r);this.lineTo(x+w,y+h-r);this.quadraticCurveTo(x+w,y+h,x+w-r,y+h);this.lineTo(x+r,y+h);this.quadraticCurveTo(x,y+h,x,y+h-r);this.lineTo(x,y+r);this.quadraticCurveTo(x,y,x+r,y);this.closePath();}; }
 
 requestAnimationFrame(gameLoop);
+
+// --- DEBUG: Skip current boss ---
+function skipBoss() {
+  if (gameState !== 'playing') return;
+  if (currentEnemy === 'golem') {
+    golem.hp = 0; golem.state = 'dead'; golem.stateTimer = 3.1;
+  } else if (currentEnemy === 'lady') {
+    lady.hp = 0; lady.state = 'dead'; lady.stateTimer = 3.1;
+  } else if (currentEnemy === 'lion') {
+    lion.hp = 0; lion.state = 'dead'; lion.stateTimer = 3.1;
+  } else if (currentEnemy === 'spirit') {
+    spirit.hp = 0; spirit.state = 'dead'; spirit.stateTimer = 3.1;
+  } else if (currentEnemy === 'boss') {
+    boss.hp = 0; boss.state = 'death'; boss.stateTimer = 0;
+  }
+}
